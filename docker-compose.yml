@@ -1,0 +1,16 @@
+services:
+  database:
+    image: postgres:17
+    container_name: expense_manager_db
+    env_file: -.env
+    environment:
+      - POSTGRES_DB=${DATABASE_NAME}
+      - POSTGRES_USER=${USER}
+      - POSTGRES_PASSWORD=${PASSWORD}
+    ports:
+      - "5432:5432"
+  volumes:
+    - database_data:/var/lib/postgresql/data
+
+volumes:
+  database_data:
