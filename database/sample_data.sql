@@ -1,3 +1,5 @@
+-- Default expense categories
+
 INSERT INTO categories (category_name)
 VALUES ('Utilities'),
     ('Groceries'),
@@ -6,4 +8,6 @@ VALUES ('Utilities'),
     ('Healthcare'),
     ('Education'),
     ('Personal Care'),
-    ('Insurance');
+    ('Insurance'),
+    ('Savings'),
+    ('Others');
