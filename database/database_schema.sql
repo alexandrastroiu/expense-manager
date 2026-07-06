@@ -37,7 +37,7 @@ CREATE TABLE recurring_expenses(
     category_id INT NOT NULL REFERENCES categories(id),
     start_date DATE NOT NULL,
     end_date DATE CHECK (end_date IS NULL OR end_date >= start_date),
-    frequency VARCHAR(50) NOT NULL CHECK (frequency IN ('daily', 'weekly', 'monthly', 'yearly'))
+    frequency VARCHAR(50) NOT NULL CHECK (frequency IN ('DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY'))
 );
 
 -- BUDGETS
