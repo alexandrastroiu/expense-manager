@@ -1,3 +1,14 @@
 spring:
   application:
     name: expense-manager
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/expense_manager
+    username: user
+    password: pass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
