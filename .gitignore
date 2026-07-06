@@ -1,0 +1,10 @@
+# Files to ignore
+.idea/
+*.iml
+target/
+*.log
+.env
+.DS_Store
+*.tmp
+.vscode/
+
