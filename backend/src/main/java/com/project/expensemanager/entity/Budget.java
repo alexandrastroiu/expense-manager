@@ -21,4 +21,14 @@ public class Budget {
 
     @Column(name = "budget_period", nullable = false)
     private LocalDate budgetPeriod;
+
+    // Default constructor
+    protected Budget() {}
+
+    // Parameterized constructor
+    public Budget(User user, BigDecimal amount, LocalDate budgetPeriod) {
+        this.user = user;
+        this.amount = amount;
+        this.budgetPeriod = budgetPeriod;
+    }
 }

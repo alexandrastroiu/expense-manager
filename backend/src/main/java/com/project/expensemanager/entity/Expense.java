@@ -31,4 +31,17 @@ public class Expense {
 
     @Column(name = "expense_date", nullable = false)
     private LocalDate expenseDate;
+
+    // Default constructor
+    protected Expense() {}
+
+    // Parameterized constructor
+    public Expense(User user, String title, String description, BigDecimal amount, Category category, LocalDate expenseDate) {
+        this.user = user;
+        this.title = title;
+        this.description = description;
+        this.amount = amount;
+        this.category = category;
+        this.expenseDate = expenseDate;
+    }
 }

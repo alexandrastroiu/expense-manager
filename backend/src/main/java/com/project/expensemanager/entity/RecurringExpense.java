@@ -38,4 +38,19 @@ public class RecurringExpense {
     @Enumerated(EnumType.STRING)
     @Column(name = "frequency", nullable = false, length = 50)
     private Frequency frequency;
+
+    // Default constructor
+    protected RecurringExpense() {}
+
+    // Parameterized constructor
+    public RecurringExpense(User user, String title, String description, BigDecimal amount, Category category, LocalDate startDate, LocalDate endDate, Frequency frequency) {
+        this.user = user;
+        this.title = title;
+        this.description = description;
+        this.amount = amount;
+        this.category = category;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.frequency = frequency;
+    }
 }

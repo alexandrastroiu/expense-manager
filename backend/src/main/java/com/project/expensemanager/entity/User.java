@@ -23,4 +23,16 @@ public class User {
 
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
+
+    // Default constructor
+    protected User() {}
+
+    // Parameterized constructor
+    public User(String username, String firstName, String lastName, String passwordHash, String email) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.passwordHash = passwordHash;
+        this.email = email;
+    }
 }

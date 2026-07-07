@@ -11,4 +11,12 @@ public class Category {
 
     @Column(name = "category_name", nullable = false, unique = true, length = 50)
     private String categoryName;
+
+    // Default constructor
+    protected Category() {}
+
+    // Parameterized constructor
+    public Category(String categoryName) {
+        this.categoryName = categoryName;
+    }
 }
