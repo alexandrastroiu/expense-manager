@@ -31,4 +31,29 @@ public class Budget {
         this.amount = amount;
         this.budgetPeriod = budgetPeriod;
     }
+
+    // Getters and Setters
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public LocalDate getBudgetPeriod() {
+        return budgetPeriod;
+    }
+
+    public void setBudgetPeriod(LocalDate budgetPeriod) {
+        this.budgetPeriod = budgetPeriod;
+    }
 }
