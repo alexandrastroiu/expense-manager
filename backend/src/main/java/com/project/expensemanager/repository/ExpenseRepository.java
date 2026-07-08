@@ -20,7 +20,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Integer> {
 
     List<Expense> findByUserAndExpenseDateBefore(User user, LocalDate expenseDate);
 
-    List<Expense> findByUserAndExpenseDateOrderByAmount(User user, LocalDate expenseDate);
+    List<Expense> findByUserAndExpenseDateOrderByAmountDesc(User user, LocalDate expenseDate);
 
     List<Expense> findByUserAndExpenseDateBetween(User user, LocalDate startDate, LocalDate endDate);
 
