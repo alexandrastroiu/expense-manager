@@ -33,14 +33,30 @@ public class ExpenseService {
         return expenseRepository.save(newExpense);
     }
 
-    public List<Expense> getExpensesForUser() {
+    // Get all expenses for a user
+    public List<Expense> getExpensesForUser(User user) {
 
     }
 
+    // Get an expense
+    public Expense getUserExpenseById(User user, Integer expenseId) {
+        Expense expense = expenseRepository.findById(expenseId).orElseThrow(() -> new RuntimeException("Expense not found."));
+
+        if (expense.getUser().getId().equals(user.getId())) {
+            return expense;
+        }
+        throw new RuntimeException("Cannot access this expense.");
+    }
+
+    // Update
     public Expense updateExpense() {
 
     }
 
-    public void deleteExpense() {}
+    // Delete
+    public void deleteExpense(User user, Integer expenseId) {
+
+        expenseRepository.delete(expense);
+    }
 
 }
