@@ -49,13 +49,24 @@ public class ExpenseService {
     }
 
     // Update
-    public Expense updateExpense() {
+    public Expense updateExpense(Integer expenseId, User user, String title, String description, BigDecimal amount, Integer categoryId, LocalDate expenseDate) {
+        Expense expense = getUserExpenseById(user, expenseId);
 
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found"));
+
+        expense.setUser(user);
+        expense.setTitle(title);
+        expense.setDescription(description);
+        expense.setExpenseDate(expenseDate);
+        expense.setAmount(amount);
+        expense.setCategory(category);
+
+        return expenseRepository.save(expense);
     }
 
     // Delete
     public void deleteExpense(User user, Integer expenseId) {
-
+        Expense expense = getUserExpenseById(user, expenseId);
         expenseRepository.delete(expense);
     }
 
