@@ -38,5 +38,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Integer> {
 
     List<Expense> findByUserAndAmountBetween(User user, BigDecimal minAmount, BigDecimal maxAmount);
 
+    List<Expense> findByUserAndCategoryAndAmountBetween(User user, Category category,BigDecimal minAmount, BigDecimal maxAmount);
+
     List<Expense> findByUserAndExpenseDateBetweenAndAmountBetween(User user, LocalDate startDate, LocalDate endDate, BigDecimal minAmount, BigDecimal maxAmount);
 }
