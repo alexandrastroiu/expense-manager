@@ -35,7 +35,7 @@ public class ExpenseService {
 
     // Get all expenses for a user
     public List<Expense> getExpensesForUser(User user) {
-
+        return expenseRepository.findByUser(user);
     }
 
     // Get an expense
