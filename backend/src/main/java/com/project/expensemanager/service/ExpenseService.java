@@ -33,12 +33,11 @@ public class ExpenseService {
         return expenseRepository.save(newExpense);
     }
 
-    // Get all expenses for a user
+    // Find
     public List<Expense> getExpensesForUser(User user) {
         return expenseRepository.findByUser(user);
     }
 
-    // Get an expense
     public Expense getUserExpenseById(User user, Integer expenseId) {
         Expense expense = expenseRepository.findById(expenseId).orElseThrow(() -> new RuntimeException("Expense not found."));
 
@@ -48,13 +47,74 @@ public class ExpenseService {
         throw new RuntimeException("Cannot access this expense.");
     }
 
+    public List<Expense> getUserExpensesByDate(User user, LocalDate expenseDate) {
+        return expenseRepository.findByUserAndExpenseDate(user, expenseDate);
+    }
+
+    public List<Expense> getUserExpensesByTitle(User user, String title) {
+        return expenseRepository.findByUserAndTitle(user, title);
+    }
+
+    public List<Expense> getUserExpenseByCategory(User user, Integer categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found."));
+
+        return expenseRepository.findByUserAndCategory(user, category);
+    }
+
+    public List<Expense> getUserExpenseByAmount(User user, BigDecimal amount) {
+        return expenseRepository.findByUserAndAmount(user, amount);
+    }
+
+    // Filter user expenses
+   public List<Expense> filterExpenses(User user, Integer categoryId, BigDecimal minAmount, BigDecimal maxAmount, LocalDate start, LocalDate end) {
+
+        if (categoryId != null) {
+            Category selectedCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category " + categoryId + " not found."));
+
+            if (start != null && end != null && minAmount != null && maxAmount != null) {
+                return expenseRepository.findByUserAndCategoryAndExpenseDateBetweenAndAmountBetween(user, selectedCategory, start, end, minAmount, maxAmount);
+            }
+
+            if (start != null && end != null) {
+                return expenseRepository.findByUserAndCategoryAndExpenseDateBetween(user, selectedCategory, start, end);
+            }
+
+            if (start != null) {
+                return expenseRepository.findByUserAndCategoryAndExpenseDateAfter(user, selectedCategory, start);
+            }
+
+            if (end != null) {
+                return expenseRepository.findByUserAndCategoryAndExpenseDateBefore(user, selectedCategory, end);
+            }
+        }
+        else {
+            if (start != null && end != null && minAmount != null && maxAmount != null) {
+                return expenseRepository.findByUserAndExpenseDateBetweenAndAmountBetween(user, start, end, minAmount, maxAmount);
+            }
+
+            if (start != null && end != null) {
+                return expenseRepository.findByUserAndExpenseDateBetween(user, start, end);
+            }
+
+            if (start != null) {
+                return expenseRepository.findByUserAndExpenseDateAfter(user, start);
+            }
+
+            if (end != null) {
+                return expenseRepository.findByUserAndExpenseDateBefore(user, end);
+            }
+        }
+
+        return getExpensesForUser(user);
+    }
+
+
     // Update
     public Expense updateExpense(Integer expenseId, User user, String title, String description, BigDecimal amount, Integer categoryId, LocalDate expenseDate) {
         Expense expense = getUserExpenseById(user, expenseId);
 
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found"));
 
-        expense.setUser(user);
         expense.setTitle(title);
         expense.setDescription(description);
         expense.setExpenseDate(expenseDate);
@@ -69,5 +129,4 @@ public class ExpenseService {
         Expense expense = getUserExpenseById(user, expenseId);
         expenseRepository.delete(expense);
     }
-
 }
