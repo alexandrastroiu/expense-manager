@@ -3,6 +3,8 @@ package com.project.expensemanager.service;
 import com.project.expensemanager.entity.Budget;
 import com.project.expensemanager.entity.User;
 import com.project.expensemanager.repository.BudgetRepository;
+import com.project.expensemanager.repository.ExpenseRepository;
+import com.project.expensemanager.repository.RecurringExpenseRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -12,9 +14,13 @@ import java.time.LocalDate;
 public class BudgetService {
     // Inject repositories
     private final BudgetRepository budgetRepository;
+    private final ExpenseRepository expenseRepository;
+    private final RecurringExpenseRepository recurringExpenseRepository;
 
-    public BudgetService(BudgetRepository budgetRepository) {
+    public BudgetService(BudgetRepository budgetRepository, ExpenseRepository expenseRepository, RecurringExpenseRepository recurringExpenseRepository) {
         this.budgetRepository = budgetRepository;
+        this.expenseRepository = expenseRepository;
+        this.recurringExpenseRepository = recurringExpenseRepository;
     }
 
     // Business logic
