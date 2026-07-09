@@ -1,5 +1,6 @@
 package com.project.expensemanager.repository;
 
+import com.project.expensemanager.entity.Category;
 import com.project.expensemanager.entity.Frequency;
 import com.project.expensemanager.entity.RecurringExpense;
 import com.project.expensemanager.entity.User;
@@ -14,11 +15,13 @@ public interface RecurringExpenseRepository extends JpaRepository<RecurringExpen
     // Query methods
     List<RecurringExpense> findByUser(User user);
 
-    List<RecurringExpense> findByUserOrderByAmount(User user);
+    RecurringExpense findByUserAndId(User user, Integer id);
 
     List<RecurringExpense> findByUserAndTitle(User user, String title);
 
-    List<RecurringExpense> findByUserAndAmountBetween(User user, BigDecimal startAmount, BigDecimal endAmount);
-
     List<RecurringExpense> findByUserAndFrequency(User user, Frequency frequency);
+
+    List<RecurringExpense> findByUserAndCategory(User user, Category category);
+
+    List<RecurringExpense> findByUserAndAmountBetween(User user, BigDecimal startAmount, BigDecimal endAmount);
 }
