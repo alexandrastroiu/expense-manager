@@ -2,6 +2,7 @@ package com.project.expensemanager.service;
 
 import com.project.expensemanager.entity.Budget;
 import com.project.expensemanager.entity.Expense;
+import com.project.expensemanager.entity.RecurringExpense;
 import com.project.expensemanager.entity.User;
 import com.project.expensemanager.repository.BudgetRepository;
 import com.project.expensemanager.repository.ExpenseRepository;
@@ -74,8 +75,19 @@ public class BudgetService {
     }
 
     // Get total of monthly expenses
-    public BigDecimal getTotalMonthlyExpenses() {
-       //TODO
+    public BigDecimal getTotalMonthlyExpenses(User user, LocalDate period) {
+       LocalDate start = period.withDayOfMonth(1);
+       LocalDate end = period.withDayOfMonth(period.lengthOfMonth());
+       BigDecimal total = new BigDecimal("0");
+       BigDecimal currentExpenses = getTotalCurrentExpenses(user, period);
+       total = total.add(currentExpenses);
+       List<RecurringExpense> recurringExpenses = recurringExpenseRepository.findByUser(user);
+
+       for (RecurringExpense r : recurringExpenses) {
+           //TODO
+       }
+
+       return total;
     }
 
     // Get current remaining budget after expenses
@@ -84,8 +96,8 @@ public class BudgetService {
     }
 
     // Get monthly remaining budget after expenses
-    public BigDecimal getRemainingMonthlyBudget() {
-        //TODO
+    public BigDecimal getRemainingMonthlyBudget(User user, LocalDate period) {
+        return ((getUserBudgetByPeriod(user, period).getAmount()).subtract(getTotalMonthlyExpenses(user, period)));
     }
 
     // Get percentage of budget usage per month
