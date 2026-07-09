@@ -26,14 +26,14 @@ public class ExpenseService {
     // Business logic
     // Create
     public Expense createExpense(User user, String title, String description, BigDecimal amount, Integer categoryId, LocalDate expenseDate) {
-        Category selectedCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category " + categoryId + " not found."));
+        Category selectedCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found."));
 
         Expense newExpense = new Expense(user, title, description, amount, selectedCategory, expenseDate);
 
         return expenseRepository.save(newExpense);
     }
 
-    // Find
+    // Read
     public List<Expense> getExpensesForUser(User user) {
         return expenseRepository.findByUser(user);
     }
@@ -69,7 +69,7 @@ public class ExpenseService {
    public List<Expense> filterExpenses(User user, Integer categoryId, BigDecimal minAmount, BigDecimal maxAmount, LocalDate start, LocalDate end) {
 
         if (categoryId != null) {
-            Category selectedCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category " + categoryId + " not found."));
+            Category selectedCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found."));
 
             if (start != null && end != null && minAmount != null && maxAmount != null) {
                 return expenseRepository.findByUserAndCategoryAndExpenseDateBetweenAndAmountBetween(user, selectedCategory, start, end, minAmount, maxAmount);
