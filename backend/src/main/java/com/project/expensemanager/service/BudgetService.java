@@ -1,6 +1,7 @@
 package com.project.expensemanager.service;
 
 import com.project.expensemanager.entity.Budget;
+import com.project.expensemanager.entity.Expense;
 import com.project.expensemanager.entity.User;
 import com.project.expensemanager.repository.BudgetRepository;
 import com.project.expensemanager.repository.ExpenseRepository;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class BudgetService {
@@ -32,7 +34,6 @@ public class BudgetService {
         return budgetRepository.save(budget);
     }
 
-
     // Read
     public Budget getUserBudgetById(User user, Integer budgetId) {
         return budgetRepository.findByUserAndId(user, budgetId).orElseThrow(() -> new RuntimeException("Budget not found"));
@@ -54,8 +55,26 @@ public class BudgetService {
         budgetRepository.delete(budget);
     }
 
+    // Get total of current expenses
+    public BigDecimal getTotalCurrentExpenses(User user, LocalDate period) {
+        LocalDate startDate = period.withDayOfMonth(1);
+        LocalDate endDate = period.withDayOfMonth(period.lengthOfMonth());
+        List<Expense> currentExpenses = expenseRepository.findByUserAndExpenseDateBetween(user, startDate, endDate);
+        BigDecimal total = new BigDecimal("0");
+
+        for (Expense e : currentExpenses) {
+            total = total.add(e.getAmount());
+        }
+
+        return total;
+    }
+
     // Get total of monthly expenses
 
+    // Get current remaining budget after expenses
+
     // Get monthly remaining budget after expenses
+
+    // Get percentage of budget usage per month
 
 }
