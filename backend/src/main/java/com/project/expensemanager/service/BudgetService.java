@@ -74,6 +74,9 @@ public class BudgetService {
     }
 
     // Get total of monthly expenses
+    public BigDecimal getTotalMonthlyExpenses() {
+       //TODO
+    }
 
     // Get current remaining budget after expenses
     public BigDecimal getRemainingCurrentBudget(User user, LocalDate period) {
@@ -81,7 +84,11 @@ public class BudgetService {
     }
 
     // Get monthly remaining budget after expenses
+    public BigDecimal getRemainingMonthlyBudget() {
+        //TODO
+    }
 
     // Get percentage of budget usage per month
+    // TODO
 
 }
