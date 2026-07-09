@@ -33,6 +33,14 @@ public class BudgetService {
     }
 
     // Update
+    public Budget updateBudget(User user, Integer budgetId, BigDecimal amount, LocalDate budgetPeriod) {
+        Budget budget = getUserBudgetById(user, budgetId);
+        budgetPeriod = budgetPeriod.withDayOfMonth(1);
+
+        budget.setAmount(amount);
+        budget.setBudgetPeriod(budgetPeriod);
+        return budgetRepository.save(budget);
+    }
 
     // Delete
     public void deleteBudget(User user, Integer budgetId) {
