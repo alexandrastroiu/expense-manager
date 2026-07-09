@@ -10,6 +10,7 @@ import com.project.expensemanager.repository.RecurringExpenseRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -101,6 +102,14 @@ public class BudgetService {
     }
 
     // Get percentage of budget usage per month
-    // TODO
+    public BigDecimal getBudgetPercentage(User user, LocalDate period) {
+        BigDecimal budget = getUserBudgetByPeriod(user, period).getAmount();
+        BigDecimal expenses = getTotalMonthlyExpenses(user, period);
 
+        if (budget.compareTo(BigDecimal.ZERO) == 0) {   // Handle edge case
+            return BigDecimal.ZERO;
+        }
+
+        return expenses.multiply(BigDecimal.valueOf(100)).divide(budget, RoundingMode.HALF_UP);
+    }
 }
