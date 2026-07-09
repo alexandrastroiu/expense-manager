@@ -10,7 +10,5 @@ import java.util.Optional;
 public interface BudgetRepository extends JpaRepository<Budget, Integer> {
 
     // Query methods
-    Optional<Budget> findByUserAndBudgetPeriod(User user, LocalDate budgetPeriod);
-
-    boolean existsByUserAndBudgetPeriod(User user, LocalDate budgetPeriod);
+    Optional<Budget> findByUserAndId(User user, Integer budgetId);
 }
