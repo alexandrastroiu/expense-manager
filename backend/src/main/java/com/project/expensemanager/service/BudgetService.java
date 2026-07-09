@@ -39,6 +39,10 @@ public class BudgetService {
         return budgetRepository.findByUserAndId(user, budgetId).orElseThrow(() -> new RuntimeException("Budget not found"));
     }
 
+    public Budget getUserBudgetByPeriod(User user, LocalDate period) {
+        return budgetRepository.findByUserAndPeriod(user, period).orElseThrow(() -> new RuntimeException("Budget not found"));
+    }
+
     // Update
     public Budget updateBudget(User user, Integer budgetId, BigDecimal amount, LocalDate budgetPeriod) {
         Budget budget = getUserBudgetById(user, budgetId);
@@ -72,6 +76,9 @@ public class BudgetService {
     // Get total of monthly expenses
 
     // Get current remaining budget after expenses
+    public BigDecimal getRemainingCurrentBudget(User user, LocalDate period) {
+        return (getUserBudgetByPeriod(user, period).getAmount()).subtract(getTotalCurrentExpenses(user, period));
+    }
 
     // Get monthly remaining budget after expenses
 
