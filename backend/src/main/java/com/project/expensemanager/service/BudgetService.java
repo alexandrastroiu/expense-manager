@@ -28,10 +28,17 @@ public class BudgetService {
 
 
     // Read
+    public Budget getUserBudgetById(User user, Integer budgetId) {
+        return budgetRepository.findByUserAndId(user, budgetId).orElseThrow(() -> new RuntimeException("Budget not found"));
+    }
 
     // Update
 
     // Delete
+    public void deleteBudget(User user, Integer budgetId) {
+        Budget budget = getUserBudgetById(user, budgetId);
+        budgetRepository.delete(budget);
+    }
 
     // Get total of monthly expenses
 
