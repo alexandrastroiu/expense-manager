@@ -118,4 +118,8 @@ public class RecurringExpense {
     public void setFrequency(Frequency frequency) {
         this.frequency = frequency;
     }
+
+    public Integer getId() {
+        return id;
+    }
 }
