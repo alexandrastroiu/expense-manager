@@ -1,5 +1,6 @@
 package com.project.expensemanager.service;
 
+import com.project.expensemanager.dto.recurringexpense.RecurringExpenseRequest;
 import com.project.expensemanager.dto.recurringexpense.RecurringExpenseResponse;
 import com.project.expensemanager.entity.Category;
 import com.project.expensemanager.entity.Frequency;
@@ -96,4 +97,16 @@ public class RecurringExpenseService {
     }
 
     // Map request to entity
+    private RecurringExpense mapToEntity(RecurringExpenseRequest request, User user, Category category) {
+        return new RecurringExpense(
+                user,
+                request.title(),
+                request.description(),
+                request.amount(),
+                category,
+                request.startDate(),
+                request.endDate(),
+                request.frequency()
+                );
+    }
 }
