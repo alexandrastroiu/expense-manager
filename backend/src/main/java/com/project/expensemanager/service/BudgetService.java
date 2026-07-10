@@ -110,7 +110,9 @@ public class BudgetService {
                            total = total.add(r.getAmount());
                        break;
                    case YEARLY:
-                       if (period.getMonthValue() == rStart.getMonthValue()) {
+                       LocalDate paymentDate = LocalDate.of(period.getYear(), period.getMonth(), Math.min(rStart.getDayOfMonth(), monthEnd.getDayOfMonth()));
+
+                       if (rEnd == null || paymentDate.isBefore(rEnd)) {
                            total = total.add(r.getAmount());
                        }
                        break;
