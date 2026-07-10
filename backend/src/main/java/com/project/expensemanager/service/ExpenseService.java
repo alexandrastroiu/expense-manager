@@ -1,5 +1,6 @@
 package com.project.expensemanager.service;
 
+import com.project.expensemanager.dto.expense.ExpenseRequest;
 import com.project.expensemanager.dto.expense.ExpenseResponse;
 import com.project.expensemanager.entity.Category;
 import com.project.expensemanager.entity.Expense;
@@ -154,4 +155,14 @@ public class ExpenseService {
     }
 
     // Map request to entity
+    private Expense mapToEntity(ExpenseRequest request, User user, Category category) {
+        return new Expense(
+                user,
+                request.title(),
+                request.description(),
+                request.amount(),
+                category,
+                request.expenseDate()
+                );
+    }
 }
