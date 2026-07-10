@@ -1,5 +1,6 @@
 package com.project.expensemanager.service;
 
+import com.project.expensemanager.dto.recurringexpense.RecurringExpenseResponse;
 import com.project.expensemanager.entity.Category;
 import com.project.expensemanager.entity.Frequency;
 import com.project.expensemanager.entity.RecurringExpense;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class RecurringExpenseService {
@@ -78,4 +80,20 @@ public class RecurringExpenseService {
     RecurringExpense recurringExpense = getUserRecurringExpenseById(user, recurringExpenseId);
     recurringExpenseRepository.delete(recurringExpense);
     }
+
+    // Map entity to response
+    private RecurringExpenseResponse mapToResponse(RecurringExpense recurringExpense) {
+        return new RecurringExpenseResponse(
+                recurringExpense.getId(),
+                recurringExpense.getTitle(),
+                recurringExpense.getDescription(),
+                recurringExpense.getAmount(),
+                recurringExpense.getCategory().getId(),
+                recurringExpense.getStartDate(),
+                recurringExpense.getEndDate(),
+                recurringExpense.getFrequency()
+        );
+    }
+
+    // Map request to entity
 }
