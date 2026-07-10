@@ -1,5 +1,6 @@
 package com.project.expensemanager.service;
 
+import com.project.expensemanager.dto.expense.ExpenseResponse;
 import com.project.expensemanager.entity.Category;
 import com.project.expensemanager.entity.Expense;
 import com.project.expensemanager.entity.User;
@@ -139,4 +140,18 @@ public class ExpenseService {
         Expense expense = getUserExpenseById(user, expenseId);
         expenseRepository.delete(expense);
     }
+
+    // Map entity to response
+    private ExpenseResponse mapToResponse(Expense expense) {
+        return new ExpenseResponse(
+                expense.getId(),
+                expense.getTitle(),
+                expense.getDescription(),
+                expense.getAmount(),
+                expense.getCategory().getId(),
+                expense.getExpenseDate()
+                );
+    }
+
+    // Map request to entity
 }
