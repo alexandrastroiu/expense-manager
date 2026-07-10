@@ -86,10 +86,10 @@ public class BudgetService {
        List<RecurringExpense> recurringExpenses = recurringExpenseRepository.findByUser(user);
 
        for (RecurringExpense r : recurringExpenses) {
-           //TODO
            LocalDate rStart = r.getStartDate();
            LocalDate rEnd = r.getEndDate();
            long activeDays;
+           LocalDate  paymentDate;
            boolean startsBeforeMonthEnd = rStart.isBefore(monthEnd) || rStart.isEqual(monthEnd);
            boolean endsAfterMonthStart = rEnd == null || rEnd.isAfter(monthStart) || rEnd.isEqual(monthStart);
 
@@ -107,13 +107,19 @@ public class BudgetService {
                        //TODO
                        break;
                    case MONTHLY:
+                       paymentDate = LocalDate.of(period.getYear(), period.getMonth(), Math.min(rStart.getDayOfMonth(), monthEnd.getDayOfMonth()));
+
+                       if (rEnd == null || !paymentDate.isAfter(rEnd)) {
                            total = total.add(r.getAmount());
+                       }
                        break;
                    case YEARLY:
-                       LocalDate paymentDate = LocalDate.of(period.getYear(), period.getMonth(), Math.min(rStart.getDayOfMonth(), monthEnd.getDayOfMonth()));
+                       if (period.getMonth() == rStart.getMonth()) {
+                           paymentDate = LocalDate.of(period.getYear(), rStart.getMonth(), Math.min(rStart.getDayOfMonth(), monthEnd.getDayOfMonth()));
 
-                       if (rEnd == null || paymentDate.isBefore(rEnd)) {
-                           total = total.add(r.getAmount());
+                           if (rEnd == null || !paymentDate.isAfter(rEnd)) {
+                               total = total.add(r.getAmount());
+                           }
                        }
                        break;
                }
