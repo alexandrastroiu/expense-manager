@@ -93,4 +93,8 @@ public class Expense {
     public void setExpenseDate(LocalDate expenseDate) {
         this.expenseDate = expenseDate;
     }
+
+    public Integer getId() {
+        return id;
+    }
 }
