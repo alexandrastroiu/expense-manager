@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -77,8 +78,8 @@ public class BudgetService {
 
     // Get total of monthly expenses
     public BigDecimal getTotalMonthlyExpenses(User user, LocalDate period) {
-       LocalDate start = period.withDayOfMonth(1);
-       LocalDate end = period.withDayOfMonth(period.lengthOfMonth());
+       LocalDate monthStart = period.withDayOfMonth(1);
+       LocalDate monthEnd = period.withDayOfMonth(period.lengthOfMonth());
        BigDecimal total = new BigDecimal("0");
        BigDecimal currentExpenses = getTotalCurrentExpenses(user, period);
        total = total.add(currentExpenses);
@@ -86,6 +87,35 @@ public class BudgetService {
 
        for (RecurringExpense r : recurringExpenses) {
            //TODO
+           LocalDate rStart = r.getStartDate();
+           LocalDate rEnd = r.getEndDate();
+           long activeDays;
+           boolean startsBeforeMonthEnd = rStart.isBefore(monthEnd) || rStart.isEqual(monthEnd);
+           boolean endsAfterMonthStart = rEnd == null || rEnd.isAfter(monthStart) || rEnd.isEqual(monthStart);
+
+           if (startsBeforeMonthEnd && endsAfterMonthStart) {
+               switch (r.getFrequency()) {
+                   case DAILY:
+                       LocalDate recurringStart = rStart.isAfter(monthStart) ? rStart : monthStart;
+                       LocalDate recurringEnd = rEnd == null || rEnd.isAfter(monthEnd) ? monthEnd : rEnd;
+
+                       activeDays = ChronoUnit.DAYS.between(recurringStart, recurringEnd) + 1;
+
+                       total = total.add(r.getAmount().multiply(BigDecimal.valueOf(activeDays)));
+                       break;
+                   case WEEKLY:
+                       //TODO
+                       break;
+                   case MONTHLY:
+                           total = total.add(r.getAmount());
+                       break;
+                   case YEARLY:
+                       if (period.getMonthValue() == rStart.getMonthValue()) {
+                           total = total.add(r.getAmount());
+                       }
+                       break;
+               }
+           }
        }
 
        return total;
