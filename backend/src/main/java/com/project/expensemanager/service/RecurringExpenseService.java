@@ -11,7 +11,6 @@ import com.project.expensemanager.repository.RecurringExpenseRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -27,60 +26,75 @@ public class RecurringExpenseService {
 
     // Business logic
     // Create
-    public RecurringExpense createRecurringExpense(User user, String title, String description, BigDecimal amount, Integer categoryId, LocalDate startDate, LocalDate endDate, Frequency frequency) {
-        Category category = categoryRepository.findById(categoryId).orElseThrow( () -> new RuntimeException("Category not found"));
-        RecurringExpense recurringExpense = new RecurringExpense(user, title, description, amount, category, startDate, endDate, frequency);
+    public RecurringExpenseResponse createRecurringExpense(User user, RecurringExpenseRequest request) {
+        Category category = categoryRepository.findById(request.categoryId()).orElseThrow( () -> new RuntimeException("Category not found"));
+        RecurringExpense recurringExpense = mapToEntity(request, user, category);
 
-        return recurringExpenseRepository.save(recurringExpense);
+        RecurringExpense newRecurringExpense = recurringExpenseRepository.save(recurringExpense);
+
+        return mapToResponse(newRecurringExpense);
     }
 
     // Update
-    public RecurringExpense updateRecurringExpense(Integer recurringExpenseId,User user, String title, String description, BigDecimal amount, Integer categoryId, LocalDate startDate, LocalDate endDate, Frequency frequency) {
-        RecurringExpense recurringExpense = getUserRecurringExpenseById(user, recurringExpenseId);
+    public RecurringExpenseResponse updateRecurringExpense(Integer recurringExpenseId,User user, RecurringExpenseRequest request) {
+        RecurringExpense recurringExpense = getUserRecurringExpenseEntityById(user, recurringExpenseId);
 
-        Category category = categoryRepository.findById(categoryId).orElseThrow( () -> new RuntimeException("Category not found"));
+        Category category = categoryRepository.findById(recurringExpense.getCategory().getId()).orElseThrow( () -> new RuntimeException("Category not found"));
 
-        recurringExpense.setTitle(title);
-        recurringExpense.setDescription(description);
-        recurringExpense.setAmount(amount);
+        recurringExpense.setTitle(request.title());
+        recurringExpense.setDescription(request.description());
+        recurringExpense.setAmount(request.amount());
         recurringExpense.setCategory(category);
-        recurringExpense.setStartDate(startDate);
-        recurringExpense.setEndDate(endDate);
-        recurringExpense.setFrequency(frequency);
+        recurringExpense.setStartDate(request.startDate());
+        recurringExpense.setEndDate(request.endDate());
+        recurringExpense.setFrequency(request.frequency());
 
-        return recurringExpenseRepository.save(recurringExpense);
+        RecurringExpense updatedRecurringExpense = recurringExpenseRepository.save(recurringExpense);
+
+        return mapToResponse(updatedRecurringExpense);
     }
 
     // Read
-    public RecurringExpense getUserRecurringExpenseById(User user, Integer recurringExpenseId) {
-        return recurringExpenseRepository.findByUserAndId(user, recurringExpenseId);
+    public RecurringExpenseResponse getUserRecurringExpenseById(User user, Integer recurringExpenseId) {
+        RecurringExpense recurringExpense = recurringExpenseRepository.findByUserAndId(user, recurringExpenseId);
+
+        return mapToResponse(recurringExpense);
     }
 
-    public List<RecurringExpense> getUserRecurringExpenseByTitle(User user, String title) {
-        return recurringExpenseRepository.findByUserAndTitle(user, title);
+    public List<RecurringExpenseResponse> getUserRecurringExpenseByTitle(User user, String title) {
+        List<RecurringExpense> recurringExpense = recurringExpenseRepository.findByUserAndTitle(user, title);
+
+        return recurringExpense.stream().map(this::mapToResponse).toList();
     }
 
-    public List<RecurringExpense> getUserRecurringExpenseByCategory(User user, Integer categoryId) {
+    public List<RecurringExpenseResponse> getUserRecurringExpenseByCategory(User user, Integer categoryId) {
         Category category = categoryRepository.findById(categoryId).orElseThrow( () -> new RuntimeException("Category not found"));
 
-        return recurringExpenseRepository.findByUserAndCategory(user, category);
+        List<RecurringExpense> recurringExpense = recurringExpenseRepository.findByUserAndCategory(user, category);
+
+        return recurringExpense.stream().map(this::mapToResponse).toList();
     }
 
-    public List<RecurringExpense> getUserRecurringExpenseByFrequency(User user, Frequency frequency) {
-        return recurringExpenseRepository.findByUserAndFrequency(user, frequency);
+    public List<RecurringExpenseResponse> getUserRecurringExpenseByFrequency(User user, Frequency frequency) {
+        List<RecurringExpense> recurringExpense = recurringExpenseRepository.findByUserAndFrequency(user, frequency);
+
+        return recurringExpense.stream().map(this::mapToResponse).toList();
     }
 
     // Filter
-    public List<RecurringExpense> filterRecurringExpensesByAmount(User user, BigDecimal minAmount, BigDecimal maxAmount) {
-        return recurringExpenseRepository.findByUserAndAmountBetween(user, minAmount, maxAmount);
+    public List<RecurringExpenseResponse> filterRecurringExpensesByAmount(User user, BigDecimal minAmount, BigDecimal maxAmount) {
+        List<RecurringExpense> recurringExpense = recurringExpenseRepository.findByUserAndAmountBetween(user, minAmount, maxAmount);
+
+        return recurringExpense.stream().map(this::mapToResponse).toList();
     }
 
     // Delete
     public void deleteRecurringExpense(User user, Integer recurringExpenseId) {
-    RecurringExpense recurringExpense = getUserRecurringExpenseById(user, recurringExpenseId);
+    RecurringExpense recurringExpense = getUserRecurringExpenseEntityById(user, recurringExpenseId);
     recurringExpenseRepository.delete(recurringExpense);
     }
 
+    // Helper methods
     // Map entity to response
     private RecurringExpenseResponse mapToResponse(RecurringExpense recurringExpense) {
         return new RecurringExpenseResponse(
@@ -107,5 +121,9 @@ public class RecurringExpenseService {
                 request.endDate(),
                 request.frequency()
                 );
+    }
+
+    private RecurringExpense getUserRecurringExpenseEntityById(User user, Integer recurringExpenseId) {
+        return recurringExpenseRepository.findByUserAndId(user, recurringExpenseId);
     }
 }
