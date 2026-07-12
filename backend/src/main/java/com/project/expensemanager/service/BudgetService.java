@@ -32,35 +32,43 @@ public class BudgetService {
 
     // Business logic
     // Create
-    public Budget createBudget(User user, BigDecimal amount, LocalDate budgetPeriod) {
-        budgetPeriod = budgetPeriod.withDayOfMonth(1);        // Allow only one monthly budget
-        Budget budget = new Budget(user, amount, budgetPeriod);
+    public BudgetResponse createBudget(User user, BudgetRequest request) {
+        LocalDate date = request.budgetPeriod().withDayOfMonth(1);        // Allow only one monthly budget
+        Budget budget = new Budget(user, request.amount(), date);
 
-        return budgetRepository.save(budget);
+        Budget newBudget = budgetRepository.save(budget);
+
+        return mapToResponse(newBudget);
     }
 
     // Read
-    public Budget getUserBudgetById(User user, Integer budgetId) {
-        return budgetRepository.findByUserAndId(user, budgetId).orElseThrow(() -> new RuntimeException("Budget not found"));
+    public BudgetResponse getUserBudgetById(User user, Integer budgetId) {
+        Budget budget = budgetRepository.findByUserAndId(user, budgetId).orElseThrow(() -> new RuntimeException("Budget not found"));
+
+        return mapToResponse(budget);
     }
 
-    public Budget getUserBudgetByPeriod(User user, LocalDate period) {
-        return budgetRepository.findByUserAndPeriod(user, period).orElseThrow(() -> new RuntimeException("Budget not found"));
+    public BudgetResponse getUserBudgetByPeriod(User user, LocalDate period) {
+        Budget budget = budgetRepository.findByUserAndPeriod(user, period).orElseThrow(() -> new RuntimeException("Budget not found"));
+
+        return mapToResponse(budget);
     }
 
     // Update
-    public Budget updateBudget(User user, Integer budgetId, BigDecimal amount, LocalDate budgetPeriod) {
-        Budget budget = getUserBudgetById(user, budgetId);
+    public BudgetResponse updateBudget(User user, Integer budgetId, BigDecimal amount, LocalDate budgetPeriod) {
+        Budget budget = getUserBudgetEntityById(user, budgetId);
         budgetPeriod = budgetPeriod.withDayOfMonth(1);
 
         budget.setAmount(amount);
         budget.setBudgetPeriod(budgetPeriod);
-        return budgetRepository.save(budget);
+        Budget updatedBudget = budgetRepository.save(budget);
+
+        return mapToResponse(updatedBudget);
     }
 
     // Delete
     public void deleteBudget(User user, Integer budgetId) {
-        Budget budget = getUserBudgetById(user, budgetId);
+        Budget budget = getUserBudgetEntityById(user, budgetId);
         budgetRepository.delete(budget);
     }
 
@@ -133,17 +141,17 @@ public class BudgetService {
 
     // Get current remaining budget after expenses
     public BigDecimal getRemainingCurrentBudget(User user, LocalDate period) {
-        return (getUserBudgetByPeriod(user, period).getAmount()).subtract(getTotalCurrentExpenses(user, period));
+        return (getUserBudgetByPeriod(user, period).amount()).subtract(getTotalCurrentExpenses(user, period));
     }
 
     // Get monthly remaining budget after expenses
     public BigDecimal getRemainingMonthlyBudget(User user, LocalDate period) {
-        return ((getUserBudgetByPeriod(user, period).getAmount()).subtract(getTotalMonthlyExpenses(user, period)));
+        return ((getUserBudgetByPeriod(user, period).amount()).subtract(getTotalMonthlyExpenses(user, period)));
     }
 
     // Get percentage of budget usage per month
     public BigDecimal getBudgetPercentage(User user, LocalDate period) {
-        BigDecimal budget = getUserBudgetByPeriod(user, period).getAmount();
+        BigDecimal budget = getUserBudgetByPeriod(user, period).amount();
         BigDecimal expenses = getTotalMonthlyExpenses(user, period);
 
         if (budget.compareTo(BigDecimal.ZERO) == 0) {   // Handle edge case
@@ -153,6 +161,7 @@ public class BudgetService {
         return expenses.multiply(BigDecimal.valueOf(100)).divide(budget, RoundingMode.HALF_UP);
     }
 
+    // Helper methods
     // Map entity to response
     private BudgetResponse mapToResponse(Budget budget) {
         return new BudgetResponse(
@@ -174,5 +183,9 @@ public class BudgetService {
                 request.amount(),
                 request.budgetPeriod()
                 );
+    }
+
+    private Budget getUserBudgetEntityById(User user, Integer budgetId) {
+            return budgetRepository.findByUserAndId(user, budgetId).orElseThrow(() -> new RuntimeException("Budget not found"));
     }
 }
