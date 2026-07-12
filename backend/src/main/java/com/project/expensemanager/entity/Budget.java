@@ -56,4 +56,8 @@ public class Budget {
     public void setBudgetPeriod(LocalDate budgetPeriod) {
         this.budgetPeriod = budgetPeriod;
     }
+
+    public Integer getId() {
+        return id;
+    }
 }
