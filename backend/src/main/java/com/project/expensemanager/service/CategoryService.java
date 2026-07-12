@@ -1,5 +1,6 @@
 package com.project.expensemanager.service;
 
+import com.project.expensemanager.dto.category.CategoryResponse;
 import com.project.expensemanager.entity.Category;
 import com.project.expensemanager.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -23,5 +24,15 @@ public class CategoryService {
 
     public Category getCategoryById(Integer categoryId) {
         return categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found"));
+    }
+
+    // Map entity to response
+    private CategoryResponse mapToResponse(Category category) {
+            return new CategoryResponse(category.getId(), category.getCategoryName());
+    }
+
+    // Map request to entity
+    private Category mapToEntity(CategoryResponse request) {
+            return new Category(request.categoryName());
     }
 }
