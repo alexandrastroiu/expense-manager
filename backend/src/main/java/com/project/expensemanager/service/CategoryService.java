@@ -6,7 +6,6 @@ import com.project.expensemanager.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CategoryService {
@@ -17,22 +16,32 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
+    // Business logic
     // Read
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    public List<CategoryResponse> getAllCategories() {
+        List<Category> allCategories = categoryRepository.findAll();
+
+        return allCategories.stream().map(this::mapToResponse).toList();
     }
 
-    public Category getCategoryById(Integer categoryId) {
-        return categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found"));
+    public CategoryResponse getCategoryById(Integer categoryId) {
+        Category category =  categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found"));
+
+        return mapToResponse(category);
     }
 
+    // Helper methods
     // Map entity to response
     private CategoryResponse mapToResponse(Category category) {
-            return new CategoryResponse(category.getId(), category.getCategoryName());
+        return new CategoryResponse(category.getId(), category.getCategoryName());
     }
 
     // Map request to entity
     private Category mapToEntity(CategoryResponse request) {
-            return new Category(request.categoryName());
+        return new Category(request.categoryName());
+    }
+
+    private Category getCategoryEntityById(Integer categoryId) {
+        return categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found"));
     }
 }
