@@ -27,93 +27,105 @@ public class ExpenseService {
 
     // Business logic
     // Create
-    public Expense createExpense(User user, String title, String description, BigDecimal amount, Integer categoryId, LocalDate expenseDate) {
-        Category selectedCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found."));
+    public ExpenseResponse createExpense(User user, String title, ExpenseRequest request) {
+        Category selectedCategory = categoryRepository.findById(request.categoryId()).orElseThrow(() -> new RuntimeException("Category not found."));
 
-        Expense newExpense = new Expense(user, title, description, amount, selectedCategory, expenseDate);
+        Expense expense = mapToEntity(request, user, selectedCategory);
 
-        return expenseRepository.save(newExpense);
+        Expense newExpense = expenseRepository.save(expense);
+
+        return mapToResponse(newExpense);
     }
 
     // Read
-    public List<Expense> getExpensesForUser(User user) {
-        return expenseRepository.findByUser(user);
+    public List<ExpenseResponse> getExpensesForUser(User user) {
+        List<Expense> userExpenses = expenseRepository.findByUser(user);
+
+        return userExpenses.stream().map(this::mapToResponse).toList();
     }
 
-    public Expense getUserExpenseById(User user, Integer expenseId) {
+    public ExpenseResponse getUserExpenseById(User user, Integer expenseId) {
         Expense expense = expenseRepository.findById(expenseId).orElseThrow(() -> new RuntimeException("Expense not found."));
 
         if (expense.getUser().getId().equals(user.getId())) {
-            return expense;
+            return mapToResponse(expense);
         }
         throw new RuntimeException("Cannot access this expense.");
     }
 
-    public List<Expense> getUserExpensesByDate(User user, LocalDate expenseDate) {
-        return expenseRepository.findByUserAndExpenseDate(user, expenseDate);
+    public List<ExpenseResponse> getUserExpensesByDate(User user, LocalDate expenseDate) {
+        List<Expense> userExpenses =  expenseRepository.findByUserAndExpenseDate(user, expenseDate);
+
+        return userExpenses.stream().map(this::mapToResponse).toList();
     }
 
-    public List<Expense> getUserExpensesByTitle(User user, String title) {
-        return expenseRepository.findByUserAndTitle(user, title);
+    public List<ExpenseResponse> getUserExpensesByTitle(User user, String title) {
+        List<Expense> userExpenses =  expenseRepository.findByUserAndTitle(user, title);
+
+        return userExpenses.stream().map(this::mapToResponse).toList();
     }
 
-    public List<Expense> getUserExpenseByCategory(User user, Integer categoryId) {
+    public List<ExpenseResponse> getUserExpenseByCategory(User user, Integer categoryId) {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found."));
 
-        return expenseRepository.findByUserAndCategory(user, category);
+        List<Expense> userExpenses = expenseRepository.findByUserAndCategory(user, category);
+
+        return userExpenses.stream().map(this::mapToResponse).toList();
     }
 
-    public List<Expense> getUserExpenseByAmount(User user, BigDecimal amount) {
-        return expenseRepository.findByUserAndAmount(user, amount);
+    public List<ExpenseResponse> getUserExpenseByAmount(User user, BigDecimal amount) {
+        List<Expense> userExpenses = expenseRepository.findByUserAndAmount(user, amount);
+
+        return userExpenses.stream().map(this::mapToResponse).toList();
     }
 
     // Filter user expenses
-   public List<Expense> filterExpenses(User user, Integer categoryId, BigDecimal minAmount, BigDecimal maxAmount, LocalDate start, LocalDate end) {
+   public List<ExpenseResponse> filterExpenses(User user, Integer categoryId, BigDecimal minAmount, BigDecimal maxAmount, LocalDate start, LocalDate end) {
 
         if (categoryId != null) {
             Category selectedCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found."));
 
             if (start != null && end != null && minAmount != null && maxAmount != null) {
-                return expenseRepository.findByUserAndCategoryAndExpenseDateBetweenAndAmountBetween(user, selectedCategory, start, end, minAmount, maxAmount);
+                return expenseRepository.findByUserAndCategoryAndExpenseDateBetweenAndAmountBetween(user, selectedCategory, start, end, minAmount, maxAmount).stream().map(this::mapToResponse).toList();
             }
 
             if (start != null && end != null) {
-                return expenseRepository.findByUserAndCategoryAndExpenseDateBetween(user, selectedCategory, start, end);
+                return expenseRepository.findByUserAndCategoryAndExpenseDateBetween(user, selectedCategory, start, end).stream().map(this::mapToResponse).toList();
             }
 
             if (start != null) {
-                return expenseRepository.findByUserAndCategoryAndExpenseDateAfter(user, selectedCategory, start);
+                return expenseRepository.findByUserAndCategoryAndExpenseDateAfter(user, selectedCategory, start).stream().map(this::mapToResponse).toList();
             }
 
             if (end != null) {
-                return expenseRepository.findByUserAndCategoryAndExpenseDateBefore(user, selectedCategory, end);
+                return expenseRepository.findByUserAndCategoryAndExpenseDateBefore(user, selectedCategory, end).stream().map(this::mapToResponse).toList();
             }
 
             if ( minAmount != null && maxAmount != null) {
-                return expenseRepository.findByUserAndCategoryAndAmountBetween(user, selectedCategory, minAmount, maxAmount);
+                return expenseRepository.findByUserAndCategoryAndAmountBetween(user, selectedCategory, minAmount, maxAmount).stream().map(this::mapToResponse).toList();
             }
 
-            return expenseRepository.findByUserAndCategory(user, selectedCategory);
+            return expenseRepository.findByUserAndCategory(user, selectedCategory).stream().map(this::mapToResponse).toList();
         }
         else {
             if (start != null && end != null && minAmount != null && maxAmount != null) {
-                return expenseRepository.findByUserAndExpenseDateBetweenAndAmountBetween(user, start, end, minAmount, maxAmount);
+                return expenseRepository.findByUserAndExpenseDateBetweenAndAmountBetween(user, start, end, minAmount, maxAmount).stream().map(this::mapToResponse).toList();
             }
 
             if (start != null && end != null) {
-                return expenseRepository.findByUserAndExpenseDateBetween(user, start, end);
+                return expenseRepository.findByUserAndExpenseDateBetween(user, start, end).stream().map(this::mapToResponse).toList();
             }
 
             if (start != null) {
-                return expenseRepository.findByUserAndExpenseDateAfter(user, start);
+                return expenseRepository.findByUserAndExpenseDateAfter(user, start).stream().map(this::mapToResponse).toList();
             }
 
             if (end != null) {
-                return expenseRepository.findByUserAndExpenseDateBefore(user, end);
+                return expenseRepository.findByUserAndExpenseDateBefore(user, end).stream().map(this::mapToResponse).toList();
             }
 
             if (minAmount != null && maxAmount != null) {
-                return expenseRepository.findByUserAndAmountBetween(user, minAmount, maxAmount);
+                return expenseRepository.findByUserAndAmountBetween(user, minAmount, maxAmount).stream().map(this::mapToResponse).toList();
             }
         }
 
@@ -122,26 +134,29 @@ public class ExpenseService {
 
 
     // Update
-    public Expense updateExpense(Integer expenseId, User user, String title, String description, BigDecimal amount, Integer categoryId, LocalDate expenseDate) {
-        Expense expense = getUserExpenseById(user, expenseId);
+    public ExpenseResponse updateExpense(Integer expenseId, User user, ExpenseRequest request) {
+        Expense expense = getUserExpenseEntityById(user, expenseId);
 
-        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found"));
+        Category category = categoryRepository.findById(expense.getCategory().getId()).orElseThrow(() -> new RuntimeException("Category not found"));
 
-        expense.setTitle(title);
-        expense.setDescription(description);
-        expense.setExpenseDate(expenseDate);
-        expense.setAmount(amount);
+        expense.setTitle(request.title());
+        expense.setDescription(request.description());
+        expense.setExpenseDate(request.expenseDate());
+        expense.setAmount(request.amount());
         expense.setCategory(category);
 
-        return expenseRepository.save(expense);
+        Expense updatedExpense = expenseRepository.save(expense);
+
+        return mapToResponse(updatedExpense);
     }
 
     // Delete
     public void deleteExpense(User user, Integer expenseId) {
-        Expense expense = getUserExpenseById(user, expenseId);
+        Expense expense = getUserExpenseEntityById(user, expenseId);
         expenseRepository.delete(expense);
     }
 
+    //Helper methods
     // Map entity to response
     private ExpenseResponse mapToResponse(Expense expense) {
         return new ExpenseResponse(
@@ -164,5 +179,14 @@ public class ExpenseService {
                 category,
                 request.expenseDate()
                 );
+    }
+
+    private Expense getUserExpenseEntityById(User user, Integer expenseId) {
+        Expense expense = expenseRepository.findById(expenseId).orElseThrow(() -> new RuntimeException("Expense not found."));
+
+        if (expense.getUser().getId().equals(user.getId())) {
+            return expense;
+        }
+        throw new RuntimeException("Cannot access this expense.");
     }
 }
