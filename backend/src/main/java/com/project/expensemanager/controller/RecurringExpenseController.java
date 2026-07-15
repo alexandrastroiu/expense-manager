@@ -1,6 +1,7 @@
 package com.project.expensemanager.controller;
 
 import com.project.expensemanager.dto.expense.ExpenseRequest;
+import com.project.expensemanager.dto.expense.ExpenseResponse;
 import com.project.expensemanager.dto.recurringexpense.RecurringExpenseRequest;
 import com.project.expensemanager.dto.recurringexpense.RecurringExpenseResponse;
 import com.project.expensemanager.entity.User;
@@ -37,7 +38,18 @@ public class RecurringExpenseController {
     }
 
     // Update
-    //@PutMapping
+    @PutMapping("/{recurringExpenseId}")
+    public ResponseEntity<RecurringExpenseResponse> updateRecurringExpense(
+            @RequestParam Integer userId,
+            @PathVariable Integer recurringExpenseId,
+            @Valid @RequestBody RecurringExpenseRequest request
+    ) {
+        User user = userService.getUserById(userId);
+
+        RecurringExpenseResponse updatedExpense = recurringExpenseService.updateRecurringExpense(recurringExpenseId, user, request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(updatedExpense);
+    }
 
     // Delete
     //@DeleteMapping
