@@ -3,7 +3,6 @@ package com.project.expensemanager.controller;
 import com.project.expensemanager.dto.budget.BudgetRequest;
 import com.project.expensemanager.dto.budget.BudgetResponse;
 import com.project.expensemanager.entity.User;
-import com.project.expensemanager.repository.BudgetRepository;
 import com.project.expensemanager.service.BudgetService;
 import com.project.expensemanager.service.UserService;
 import jakarta.validation.Valid;
@@ -37,7 +36,7 @@ public class BudgetController {
 
     // Update
     @PutMapping("/{budgetId}")
-    public ResponseEntity<> updateBudget(
+    public ResponseEntity<BudgetResponse> updateBudget(
             @RequestParam Integer userId,
             @PathVariable Integer budgetId,
             @Valid @RequestBody BudgetRequest request
@@ -51,7 +50,7 @@ public class BudgetController {
 
     // Delete
     @DeleteMapping("/{budgetId}")
-    public ResponseEntity<> deleteBudget(
+    public ResponseEntity<BudgetResponse> deleteBudget(
             @RequestParam Integer userId,
             @PathVariable Integer budgetId
     ) {
@@ -61,5 +60,4 @@ public class BudgetController {
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
-
 }
