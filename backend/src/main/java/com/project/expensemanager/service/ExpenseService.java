@@ -27,7 +27,7 @@ public class ExpenseService {
 
     // Business logic
     // Create
-    public ExpenseResponse createExpense(User user, String title, ExpenseRequest request) {
+    public ExpenseResponse createExpense(User user, ExpenseRequest request) {
         Category selectedCategory = categoryRepository.findById(request.categoryId()).orElseThrow(() -> new RuntimeException("Category not found."));
 
         Expense expense = mapToEntity(request, user, selectedCategory);
