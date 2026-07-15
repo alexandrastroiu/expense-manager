@@ -34,7 +34,7 @@ public class RecurringExpenseController {
 
         RecurringExpenseResponse recurringExpense = recurringExpenseService.createRecurringExpense(user, request);
 
-        return ResponseEntity.status(HttpStatus.OK).body(recurringExpense);
+        return ResponseEntity.status(HttpStatus.CREATED).body(recurringExpense);
     }
 
     // Update
@@ -52,6 +52,16 @@ public class RecurringExpenseController {
     }
 
     // Delete
-    //@DeleteMapping
+    @DeleteMapping("/{recurringExpenseId}")
+    public ResponseEntity<Void> deleteRecurringExpense(
+            @RequestParam Integer userId,
+            @PathVariable Integer recurringExpenseId
+    ) {
+        User user = userService.getUserById(userId);
+
+        recurringExpenseService.deleteRecurringExpense(user, recurringExpenseId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
 
 }
