@@ -1,7 +1,45 @@
 package com.project.expensemanager.controller;
 
-import org.springframework.web.bind.annotation.RestController;
+import com.project.expensemanager.dto.expense.ExpenseRequest;
+import com.project.expensemanager.dto.recurringexpense.RecurringExpenseRequest;
+import com.project.expensemanager.dto.recurringexpense.RecurringExpenseResponse;
+import com.project.expensemanager.entity.User;
+import com.project.expensemanager.service.RecurringExpenseService;
+import com.project.expensemanager.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/api/recurringexpenses")  // Base URL
 public class RecurringExpenseController {
+
+    private final UserService userService;
+    private final RecurringExpenseService recurringExpenseService;
+
+    public RecurringExpenseController(UserService userService, RecurringExpenseService recurringExpenseService) {
+        this.userService = userService;
+        this.recurringExpenseService = recurringExpenseService;
+    }
+
+    // Create
+    @PostMapping
+    public ResponseEntity<RecurringExpenseResponse> createRecurringExpense(
+            @RequestParam Integer userId,
+            @Valid @RequestBody RecurringExpenseRequest request
+    ) {
+        User user = userService.getUserById(userId);
+
+        RecurringExpenseResponse recurringExpense = recurringExpenseService.createRecurringExpense(user, request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(recurringExpense);
+    }
+
+    // Update
+    //@PutMapping
+
+    // Delete
+    //@DeleteMapping
+
 }
