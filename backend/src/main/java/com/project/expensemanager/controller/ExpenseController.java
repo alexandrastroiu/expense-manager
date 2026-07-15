@@ -37,4 +37,17 @@ public class ExpenseController {
                 return ResponseEntity.status(HttpStatus.CREATED).body(response);
             }
 
+    // Delete
+    @DeleteMapping("/{expenseId}")
+    public ResponseEntity<ExpenseResponse> deleteExpense(
+            @RequestParam Integer userId,
+            @PathVariable Integer expenseId
+    ) {
+        User user = userService.getUserById(userId);
+
+        expenseService.deleteExpense(user, expenseId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
 }
