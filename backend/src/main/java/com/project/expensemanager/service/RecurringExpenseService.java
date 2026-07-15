@@ -81,6 +81,12 @@ public class RecurringExpenseService {
         return recurringExpense.stream().map(this::mapToResponse).toList();
     }
 
+    public List<RecurringExpenseResponse> getAllUserRecurringExpenses(User user) {
+        List<RecurringExpense> recurringExpense = recurringExpenseRepository.findByUser(user);
+
+        return recurringExpense.stream().map(this::mapToResponse).toList();
+    }
+
     // Filter
     public List<RecurringExpenseResponse> filterRecurringExpensesByAmount(User user, BigDecimal minAmount, BigDecimal maxAmount) {
         List<RecurringExpense> recurringExpense = recurringExpenseRepository.findByUserAndAmountBetween(user, minAmount, maxAmount);
