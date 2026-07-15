@@ -36,9 +36,17 @@ public class BudgetController {
     }
 
     // Update
-    @PutMapping
-    public ResponseEntity<> updateBudget() {
+    @PutMapping("/{budgetId}")
+    public ResponseEntity<> updateBudget(
+            @RequestParam Integer userId,
+            @PathVariable Integer budgetId,
+            @Valid @RequestBody BudgetRequest request
+    ) {
+        User user = userService.getUserById(userId);
 
+        BudgetResponse budget = budgetService.updateBudget(user, budgetId, request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(budget);
     }
 
     // Delete
