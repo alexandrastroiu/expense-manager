@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -62,6 +64,45 @@ public class ExpenseController {
         ExpenseResponse expense = expenseService.getUserExpenseById(user, expenseId);
 
         return ResponseEntity.status(HttpStatus.OK).body(expense);
+    }
+
+    // Filter expenses
+    @GetMapping
+    public ResponseEntity<List<ExpenseResponse>> getExpenses(
+            @RequestParam Integer userId,
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) BigDecimal minAmount,
+            @RequestParam(required = false) BigDecimal maxAmount,
+            @RequestParam(required = false) LocalDate start,
+            @RequestParam(required = false) LocalDate end
+            ) {
+        User user = userService.getUserById(userId);
+
+        List<ExpenseResponse> filteredExpenses = expenseService.filterExpenses(user, categoryId, minAmount, maxAmount, start, end);
+
+        return ResponseEntity.status(HttpStatus.OK).body(filteredExpenses);
+        }
+
+     // Search expenses
+    @GetMapping("/search")
+    public ResponseEntity<List<ExpenseResponse>> searchExpenses (
+        @RequestParam Integer userId,
+        @RequestParam(required = false) String title,
+        @RequestParam(required = false) LocalDate expenseDate,
+        @RequestParam(required = false) BigDecimal amount,
+        @RequestParam(required = false) Integer categoryId
+    ) {
+        User user = userService.getUserById(userId);
+
+        List<ExpenseResponse> expenses = expenseService.searchExpenses(
+                user,
+                expenseDate,
+                title,
+                categoryId,
+                amount
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(expenses);
     }
 
     // Update
