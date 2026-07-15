@@ -2,6 +2,7 @@ package com.project.expensemanager.controller;
 
 import com.project.expensemanager.dto.budget.BudgetRequest;
 import com.project.expensemanager.dto.budget.BudgetResponse;
+import com.project.expensemanager.dto.budget.BudgetSummaryResponse;
 import com.project.expensemanager.dto.expense.ExpenseResponse;
 import com.project.expensemanager.entity.User;
 import com.project.expensemanager.service.BudgetService;
@@ -65,7 +66,17 @@ public class BudgetController {
     }
 
     // Budget summary
-   // @GetMapping
+   @GetMapping("/summary")
+   public ResponseEntity<BudgetSummaryResponse> getBudgetSummary(
+           @RequestParam Integer userId,
+           @RequestParam @DateTimeFormat LocalDate period
+   ) {
+       User user = userService.getUserById(userId);
+
+       BudgetSummaryResponse summary = budgetService.getBudgetSummary(user, period);
+
+       return ResponseEntity.status(HttpStatus.OK).body(summary);
+   }
 
     // Update
     @PutMapping("/{budgetId}")
