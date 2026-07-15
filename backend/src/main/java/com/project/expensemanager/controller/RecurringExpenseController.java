@@ -82,7 +82,7 @@ public class RecurringExpenseController {
 
     // Search recurring expenses
     @GetMapping("/search")
-    public ResponseEntity<List<RecurringExpenseResponse>> searchExpenses (
+    public ResponseEntity<List<RecurringExpenseResponse>> searchRecurringExpenses (
             @RequestParam Integer userId,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) Frequency frequency,
@@ -96,6 +96,20 @@ public class RecurringExpenseController {
                 categoryId,
                 frequency
         );
+
+        return ResponseEntity.status(HttpStatus.OK).body(expenses);
+    }
+
+    // Filter recurring expenses by amount
+    @GetMapping("/filter")
+    public ResponseEntity<List<RecurringExpenseResponse>> filterRecurringExpenses (
+            @RequestParam Integer userId,
+            @RequestParam BigDecimal minAmount,
+            @RequestParam BigDecimal maxAmount
+    ) {
+        User user = userService.getUserById(userId);
+
+        List<RecurringExpenseResponse> expenses = recurringExpenseService.filterRecurringExpensesByAmount(user, minAmount, maxAmount);
 
         return ResponseEntity.status(HttpStatus.OK).body(expenses);
     }
