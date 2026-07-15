@@ -15,13 +15,18 @@ public class UserService {
     }
 
     // Business logic
-    User getUserByUsername(String username) {
+    public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow( () -> new RuntimeException("User with username " + username + " not found."));
     }
 
-    User getUserByEmail(String email) {
+    public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow( () -> new RuntimeException("User with email " + email + " not found"));
+    }
+
+    public User getUserById(Integer userId) {
+        return userRepository.findById(userId)
+                .orElseThrow( () -> new RuntimeException("User with email not found"));
     }
 }
