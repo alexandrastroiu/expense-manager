@@ -40,6 +40,7 @@ public class ExpenseController {
             }
 
     // Get all user expenses
+    @GetMapping
     public ResponseEntity<List<ExpenseResponse>> getAllExpenses(
             @RequestParam Integer userId
     ) {
@@ -48,6 +49,19 @@ public class ExpenseController {
         List<ExpenseResponse> expenses = expenseService.getExpensesForUser(user);
 
         return ResponseEntity.status(HttpStatus.OK).body(expenses);
+    }
+
+    // Get expense by ID
+    @GetMapping("/{expenseId}")
+    public ResponseEntity<ExpenseResponse> getExpenseById(
+            @RequestParam Integer userId,
+            @PathVariable Integer expenseId
+    ) {
+        User user = userService.getUserById(userId);
+
+        ExpenseResponse expense = expenseService.getUserExpenseById(user, expenseId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(expense);
     }
 
     // Update
