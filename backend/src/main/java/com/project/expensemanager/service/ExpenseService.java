@@ -65,7 +65,7 @@ public class ExpenseService {
         return userExpenses.stream().map(this::mapToResponse).toList();
     }
 
-    public List<ExpenseResponse> getUserExpenseByCategory(User user, Integer categoryId) {
+    public List<ExpenseResponse> getUserExpensesByCategory(User user, Integer categoryId) {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found."));
 
         List<Expense> userExpenses = expenseRepository.findByUserAndCategory(user, category);
@@ -73,10 +73,39 @@ public class ExpenseService {
         return userExpenses.stream().map(this::mapToResponse).toList();
     }
 
-    public List<ExpenseResponse> getUserExpenseByAmount(User user, BigDecimal amount) {
+    public List<ExpenseResponse> getUserExpensesByAmount(User user, BigDecimal amount) {
         List<Expense> userExpenses = expenseRepository.findByUserAndAmount(user, amount);
 
         return userExpenses.stream().map(this::mapToResponse).toList();
+    }
+
+    // Search expense by a criteria
+    public List<ExpenseResponse> searchExpenses(
+            User user,
+            LocalDate expenseDate,
+            String title,
+            Integer categoryId,
+            BigDecimal amount
+    ) {
+        List<ExpenseResponse> userExpenses;
+
+        if (title != null) {
+            userExpenses = getUserExpensesByTitle(user, title);
+        }
+        else if (expenseDate != null) {
+            userExpenses = getUserExpensesByDate(user, expenseDate);
+        }
+        else if (amount != null) {
+            userExpenses = getUserExpensesByAmount(user, amount);
+        }
+        else if (categoryId != null) {
+            userExpenses = getUserExpensesByCategory(user, categoryId);
+        }
+        else {
+            userExpenses = getExpensesForUser(user);
+        }
+
+        return userExpenses;
     }
 
     // Filter user expenses
