@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/expenses")        // Base URL
 public class ExpenseController {
@@ -36,6 +38,17 @@ public class ExpenseController {
                 // Return the response
                 return ResponseEntity.status(HttpStatus.CREATED).body(response);
             }
+
+    // Get all user expenses
+    public ResponseEntity<List<ExpenseResponse>> getAllExpenses(
+            @RequestParam Integer userId
+    ) {
+        User user = userService.getUserById(userId);
+
+        List<ExpenseResponse> expenses = expenseService.getExpensesForUser(user);
+
+        return ResponseEntity.status(HttpStatus.OK).body(expenses);
+    }
 
     // Update
     @PutMapping("/{expenseId}")
