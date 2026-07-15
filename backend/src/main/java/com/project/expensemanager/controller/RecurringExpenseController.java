@@ -3,6 +3,7 @@ package com.project.expensemanager.controller;
 import com.project.expensemanager.dto.expense.ExpenseResponse;
 import com.project.expensemanager.dto.recurringexpense.RecurringExpenseRequest;
 import com.project.expensemanager.dto.recurringexpense.RecurringExpenseResponse;
+import com.project.expensemanager.entity.Frequency;
 import com.project.expensemanager.entity.User;
 import com.project.expensemanager.service.RecurringExpenseService;
 import com.project.expensemanager.service.UserService;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -78,7 +81,24 @@ public class RecurringExpenseController {
     }
 
     // Search recurring expenses
-    //@GetMapping("/search")
+    @GetMapping("/search")
+    public ResponseEntity<List<RecurringExpenseResponse>> searchExpenses (
+            @RequestParam Integer userId,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) Frequency frequency,
+            @RequestParam(required = false) Integer categoryId
+    ) {
+        User user = userService.getUserById(userId);
+
+        List<RecurringExpenseResponse> expenses = recurringExpenseService.searchRecurringExpenses(
+                user,
+                title,
+                categoryId,
+                frequency
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(expenses);
+    }
 
     // Delete
     @DeleteMapping("/{recurringExpenseId}")
