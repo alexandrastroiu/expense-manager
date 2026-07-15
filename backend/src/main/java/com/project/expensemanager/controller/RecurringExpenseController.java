@@ -65,7 +65,17 @@ public class RecurringExpenseController {
     }
 
     // Get recurring expense by ID
-    //@GetMapping("/{recurringExpenseId}")
+    @GetMapping("/{recurringExpenseId}")
+    public ResponseEntity<RecurringExpenseResponse> getExpenseById(
+            @RequestParam Integer userId,
+            @PathVariable Integer recurringExpenseId
+    ) {
+        User user = userService.getUserById(userId);
+
+        RecurringExpenseResponse expense = recurringExpenseService.getUserRecurringExpenseById(user, recurringExpenseId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(expense);
+    }
 
     // Search recurring expenses
     //@GetMapping("/search")
