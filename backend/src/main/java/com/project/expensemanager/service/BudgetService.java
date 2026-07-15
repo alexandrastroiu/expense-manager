@@ -55,11 +55,11 @@ public class BudgetService {
     }
 
     // Update
-    public BudgetResponse updateBudget(User user, Integer budgetId, BigDecimal amount, LocalDate budgetPeriod) {
+    public BudgetResponse updateBudget(User user, Integer budgetId, BudgetRequest request) {
         Budget budget = getUserBudgetEntityById(user, budgetId);
-        budgetPeriod = budgetPeriod.withDayOfMonth(1);
+        LocalDate budgetPeriod = request.budgetPeriod().withDayOfMonth(1);
 
-        budget.setAmount(amount);
+        budget.setAmount(request.amount());
         budget.setBudgetPeriod(budgetPeriod);
         Budget updatedBudget = budgetRepository.save(budget);
 
