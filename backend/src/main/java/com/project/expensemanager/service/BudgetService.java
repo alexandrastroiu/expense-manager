@@ -2,6 +2,7 @@ package com.project.expensemanager.service;
 
 import com.project.expensemanager.dto.budget.BudgetRequest;
 import com.project.expensemanager.dto.budget.BudgetResponse;
+import com.project.expensemanager.dto.budget.BudgetSummaryResponse;
 import com.project.expensemanager.entity.Budget;
 import com.project.expensemanager.entity.Expense;
 import com.project.expensemanager.entity.RecurringExpense;
@@ -161,18 +162,29 @@ public class BudgetService {
         return expenses.multiply(BigDecimal.valueOf(100)).divide(budget, RoundingMode.HALF_UP);
     }
 
+    public BudgetSummaryResponse getBudgetSummary(User user, LocalDate period) {
+            Integer id = getUserBudgetByPeriod(user, period).id();
+            BigDecimal amount = getUserBudgetByPeriod(user, period).amount();
+
+            return new BudgetSummaryResponse(
+                    id,
+                    amount,
+                    period,
+                    getTotalCurrentExpenses(user, period),
+                    getTotalMonthlyExpenses(user, period),
+                    getRemainingCurrentBudget(user, period),
+                    getRemainingMonthlyBudget(user, period),
+                    getBudgetPercentage(user, period)
+            );
+    }
+
     // Helper methods
     // Map entity to response
     private BudgetResponse mapToResponse(Budget budget) {
         return new BudgetResponse(
                 budget.getId(),
                 budget.getAmount(),
-                budget.getBudgetPeriod(),
-                getTotalCurrentExpenses(budget.getUser(), budget.getBudgetPeriod()),
-                getTotalMonthlyExpenses(budget.getUser(), budget.getBudgetPeriod()),
-                getRemainingCurrentBudget(budget.getUser(), budget.getBudgetPeriod()),
-                getRemainingMonthlyBudget(budget.getUser(), budget.getBudgetPeriod()),
-                getBudgetPercentage(budget.getUser(), budget.getBudgetPeriod())
+                budget.getBudgetPeriod()
         );
     }
 
