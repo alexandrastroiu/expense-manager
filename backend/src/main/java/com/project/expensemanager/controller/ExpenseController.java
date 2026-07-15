@@ -1,7 +1,40 @@
 package com.project.expensemanager.controller;
 
-import org.springframework.web.bind.annotation.RestController;
+import com.project.expensemanager.dto.expense.ExpenseRequest;
+import com.project.expensemanager.dto.expense.ExpenseResponse;
+import com.project.expensemanager.entity.User;
+import com.project.expensemanager.service.ExpenseService;
+import com.project.expensemanager.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/api/expenses")        // Base URL
 public class ExpenseController {
+
+    private final ExpenseService expenseService;
+    private final UserService userService;
+
+    public ExpenseController(ExpenseService expenseService, UserService userService) {
+        this.expenseService = expenseService;
+        this.userService = userService;
+    }
+
+    // Create
+    @PostMapping
+    public ResponseEntity<ExpenseResponse> createExpense(
+            @RequestParam Integer userId,
+            @Valid @RequestBody ExpenseRequest request
+            ) {
+                // Call the service
+                User user = userService.getUserById(userId);
+
+                ExpenseResponse response = expenseService.createExpense(user, request);
+
+                // Return the response
+                return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            }
+
 }
