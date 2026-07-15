@@ -3,7 +3,6 @@ package com.project.expensemanager.controller;
 import com.project.expensemanager.dto.budget.BudgetRequest;
 import com.project.expensemanager.dto.budget.BudgetResponse;
 import com.project.expensemanager.dto.budget.BudgetSummaryResponse;
-import com.project.expensemanager.dto.expense.ExpenseResponse;
 import com.project.expensemanager.entity.User;
 import com.project.expensemanager.service.BudgetService;
 import com.project.expensemanager.service.UserService;

@@ -1,7 +1,5 @@
 package com.project.expensemanager.controller;
 
-import com.project.expensemanager.dto.expense.ExpenseRequest;
-import com.project.expensemanager.dto.expense.ExpenseResponse;
 import com.project.expensemanager.dto.recurringexpense.RecurringExpenseRequest;
 import com.project.expensemanager.dto.recurringexpense.RecurringExpenseResponse;
 import com.project.expensemanager.entity.User;
