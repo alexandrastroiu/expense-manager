@@ -42,9 +42,16 @@ public class BudgetController {
     }
 
     // Delete
-    @DeleteMapping
-    public ResponseEntity<> deleteBudget() {
+    @DeleteMapping("/{budgetId}")
+    public ResponseEntity<> deleteBudget(
+            @RequestParam Integer userId,
+            @PathVariable Integer budgetId
+    ) {
+        User user = userService.getUserById(userId);
 
+        budgetService.deleteBudget(user, budgetId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
 }
