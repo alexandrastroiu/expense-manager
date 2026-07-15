@@ -1,5 +1,6 @@
 package com.project.expensemanager.controller;
 
+import com.project.expensemanager.dto.expense.ExpenseResponse;
 import com.project.expensemanager.dto.recurringexpense.RecurringExpenseRequest;
 import com.project.expensemanager.dto.recurringexpense.RecurringExpenseResponse;
 import com.project.expensemanager.entity.User;
@@ -9,6 +10,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/recurringexpenses")  // Base URL
@@ -48,6 +51,24 @@ public class RecurringExpenseController {
 
         return ResponseEntity.status(HttpStatus.OK).body(updatedExpense);
     }
+
+    // Get all user recurring expenses
+    @GetMapping
+    public ResponseEntity<List<RecurringExpenseResponse>> getAllRecurringExpenses(
+            @RequestParam Integer userId
+    ) {
+        User user = userService.getUserById(userId);
+
+        List<RecurringExpenseResponse> expenses = recurringExpenseService.getAllUserRecurringExpenses(user);
+
+        return ResponseEntity.status(HttpStatus.OK).body(expenses);
+    }
+
+    // Get recurring expense by ID
+    //@GetMapping("/{recurringExpenseId}")
+
+    // Search recurring expenses
+    //@GetMapping("/search")
 
     // Delete
     @DeleteMapping("/{recurringExpenseId}")
