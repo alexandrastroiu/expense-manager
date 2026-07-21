@@ -1,6 +1,5 @@
 package com.project.expensemanager.service;
 
-import com.project.expensemanager.dto.expense.ExpenseResponse;
 import com.project.expensemanager.dto.recurringexpense.RecurringExpenseRequest;
 import com.project.expensemanager.dto.recurringexpense.RecurringExpenseResponse;
 import com.project.expensemanager.entity.Category;
@@ -9,12 +8,9 @@ import com.project.expensemanager.entity.RecurringExpense;
 import com.project.expensemanager.entity.User;
 import com.project.expensemanager.repository.CategoryRepository;
 import com.project.expensemanager.repository.RecurringExpenseRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 @Service

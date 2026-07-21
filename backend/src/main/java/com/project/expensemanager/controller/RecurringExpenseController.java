@@ -1,6 +1,5 @@
 package com.project.expensemanager.controller;
 
-import com.project.expensemanager.dto.expense.ExpenseResponse;
 import com.project.expensemanager.dto.recurringexpense.RecurringExpenseRequest;
 import com.project.expensemanager.dto.recurringexpense.RecurringExpenseResponse;
 import com.project.expensemanager.entity.Frequency;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
