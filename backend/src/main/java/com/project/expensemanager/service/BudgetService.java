@@ -103,19 +103,31 @@ public class BudgetService {
            LocalDate  paymentDate;
            boolean startsBeforeMonthEnd = rStart.isBefore(monthEnd) || rStart.isEqual(monthEnd);
            boolean endsAfterMonthStart = rEnd == null || rEnd.isAfter(monthStart) || rEnd.isEqual(monthStart);
+           LocalDate recurringStart = rStart.isAfter(monthStart) ? rStart : monthStart;
+           LocalDate recurringEnd = rEnd == null || rEnd.isAfter(monthEnd) ? monthEnd : rEnd;
 
            if (startsBeforeMonthEnd && endsAfterMonthStart) {
                switch (r.getFrequency()) {
                    case DAILY:
-                       LocalDate recurringStart = rStart.isAfter(monthStart) ? rStart : monthStart;
-                       LocalDate recurringEnd = rEnd == null || rEnd.isAfter(monthEnd) ? monthEnd : rEnd;
-
                        activeDays = ChronoUnit.DAYS.between(recurringStart, recurringEnd) + 1;
 
                        total = total.add(r.getAmount().multiply(BigDecimal.valueOf(activeDays)));
                        break;
                    case WEEKLY:
-                       //TODO
+                       LocalDate rStartCopy = rStart;
+
+                       while(rStartCopy.isBefore(recurringStart)) {
+                            rStartCopy = rStartCopy.plusWeeks(1);
+                       }
+
+                       int weeks = 0;
+
+                       while(!rStartCopy.isAfter(recurringEnd)) {
+                           weeks++;
+                           rStartCopy = rStartCopy.plusWeeks(1);
+                       }
+
+                       total = total.add(r.getAmount().multiply(BigDecimal.valueOf(weeks)));
                        break;
                    case MONTHLY:
                        paymentDate = LocalDate.of(period.getYear(), period.getMonth(), Math.min(rStart.getDayOfMonth(), monthEnd.getDayOfMonth()));
