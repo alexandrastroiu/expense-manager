@@ -5,6 +5,8 @@ import com.project.expensemanager.dto.expense.ExpenseResponse;
 import com.project.expensemanager.entity.Category;
 import com.project.expensemanager.entity.Expense;
 import com.project.expensemanager.entity.User;
+import com.project.expensemanager.exception.ResourceNotFoundException;
+import com.project.expensemanager.exception.UnauthorizedAccessException;
 import com.project.expensemanager.repository.CategoryRepository;
 import com.project.expensemanager.repository.ExpenseRepository;
 import org.springframework.stereotype.Service;
@@ -28,7 +30,7 @@ public class ExpenseService {
     // Business logic
     // Create
     public ExpenseResponse createExpense(User user, ExpenseRequest request) {
-        Category selectedCategory = categoryRepository.findById(request.categoryId()).orElseThrow(() -> new RuntimeException("Category not found."));
+        Category selectedCategory = categoryRepository.findById(request.categoryId()).orElseThrow(() -> new ResourceNotFoundException("Category not found."));
 
         Expense expense = mapToEntity(request, user, selectedCategory);
 
@@ -45,7 +47,7 @@ public class ExpenseService {
     }
 
     public ExpenseResponse getUserExpenseById(User user, Integer expenseId) {
-        Expense expense = expenseRepository.findById(expenseId).orElseThrow(() -> new RuntimeException("Expense not found."));
+        Expense expense = expenseRepository.findById(expenseId).orElseThrow(() -> new ResourceNotFoundException("Expense not found."));
 
         if (expense.getUser().getId().equals(user.getId())) {
             return mapToResponse(expense);
@@ -66,7 +68,7 @@ public class ExpenseService {
     }
 
     public List<ExpenseResponse> getUserExpensesByCategory(User user, Integer categoryId) {
-        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found."));
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category not found."));
 
         List<Expense> userExpenses = expenseRepository.findByUserAndCategory(user, category);
 
@@ -112,7 +114,7 @@ public class ExpenseService {
    public List<ExpenseResponse> filterExpenses(User user, Integer categoryId, BigDecimal minAmount, BigDecimal maxAmount, LocalDate start, LocalDate end) {
 
         if (categoryId != null) {
-            Category selectedCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found."));
+            Category selectedCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category not found."));
 
             if (start != null && end != null && minAmount != null && maxAmount != null) {
                 return expenseRepository.findByUserAndCategoryAndExpenseDateBetweenAndAmountBetween(user, selectedCategory, start, end, minAmount, maxAmount).stream().map(this::mapToResponse).toList();
@@ -166,7 +168,7 @@ public class ExpenseService {
     public ExpenseResponse updateExpense(Integer expenseId, User user, ExpenseRequest request) {
         Expense expense = getUserExpenseEntityById(user, expenseId);
 
-        Category category = categoryRepository.findById(expense.getCategory().getId()).orElseThrow(() -> new RuntimeException("Category not found"));
+        Category category = categoryRepository.findById(expense.getCategory().getId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
         expense.setTitle(request.title());
         expense.setDescription(request.description());
@@ -211,11 +213,11 @@ public class ExpenseService {
     }
 
     private Expense getUserExpenseEntityById(User user, Integer expenseId) {
-        Expense expense = expenseRepository.findById(expenseId).orElseThrow(() -> new RuntimeException("Expense not found."));
+        Expense expense = expenseRepository.findById(expenseId).orElseThrow(() -> new ResourceNotFoundException("Expense not found."));
 
         if (expense.getUser().getId().equals(user.getId())) {
             return expense;
         }
-        throw new RuntimeException("Cannot access this expense.");
+        throw new UnauthorizedAccessException("Cannot access this expense.");
     }
 }

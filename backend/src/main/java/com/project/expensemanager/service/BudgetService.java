@@ -7,6 +7,7 @@ import com.project.expensemanager.entity.Budget;
 import com.project.expensemanager.entity.Expense;
 import com.project.expensemanager.entity.RecurringExpense;
 import com.project.expensemanager.entity.User;
+import com.project.expensemanager.exception.ResourceNotFoundException;
 import com.project.expensemanager.repository.BudgetRepository;
 import com.project.expensemanager.repository.ExpenseRepository;
 import com.project.expensemanager.repository.RecurringExpenseRepository;
@@ -44,13 +45,13 @@ public class BudgetService {
 
     // Read
     public BudgetResponse getUserBudgetById(User user, Integer budgetId) {
-        Budget budget = budgetRepository.findByUserAndId(user, budgetId).orElseThrow(() -> new RuntimeException("Budget not found"));
+        Budget budget = budgetRepository.findByUserAndId(user, budgetId).orElseThrow(() -> new ResourceNotFoundException("Budget not found"));
 
         return mapToResponse(budget);
     }
 
     public BudgetResponse getUserBudgetByPeriod(User user, LocalDate period) {
-        Budget budget = budgetRepository.findByUserAndPeriod(user, period).orElseThrow(() -> new RuntimeException("Budget not found"));
+        Budget budget = budgetRepository.findByUserAndPeriod(user, period).orElseThrow(() -> new ResourceNotFoundException("Budget not found"));
 
         return mapToResponse(budget);
     }
@@ -210,6 +211,6 @@ public class BudgetService {
     }
 
     private Budget getUserBudgetEntityById(User user, Integer budgetId) {
-            return budgetRepository.findByUserAndId(user, budgetId).orElseThrow(() -> new RuntimeException("Budget not found"));
+            return budgetRepository.findByUserAndId(user, budgetId).orElseThrow(() -> new ResourceNotFoundException("Budget not found"));
     }
 }

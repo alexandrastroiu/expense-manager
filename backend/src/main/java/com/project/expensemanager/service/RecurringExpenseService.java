@@ -6,6 +6,7 @@ import com.project.expensemanager.entity.Category;
 import com.project.expensemanager.entity.Frequency;
 import com.project.expensemanager.entity.RecurringExpense;
 import com.project.expensemanager.entity.User;
+import com.project.expensemanager.exception.ResourceNotFoundException;
 import com.project.expensemanager.repository.CategoryRepository;
 import com.project.expensemanager.repository.RecurringExpenseRepository;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class RecurringExpenseService {
     // Business logic
     // Create
     public RecurringExpenseResponse createRecurringExpense(User user, RecurringExpenseRequest request) {
-        Category category = categoryRepository.findById(request.categoryId()).orElseThrow( () -> new RuntimeException("Category not found"));
+        Category category = categoryRepository.findById(request.categoryId()).orElseThrow( () -> new ResourceNotFoundException("Category not found"));
         RecurringExpense recurringExpense = mapToEntity(request, user, category);
 
         RecurringExpense newRecurringExpense = recurringExpenseRepository.save(recurringExpense);
@@ -39,7 +40,7 @@ public class RecurringExpenseService {
     public RecurringExpenseResponse updateRecurringExpense(Integer recurringExpenseId,User user, RecurringExpenseRequest request) {
         RecurringExpense recurringExpense = getUserRecurringExpenseEntityById(user, recurringExpenseId);
 
-        Category category = categoryRepository.findById(recurringExpense.getCategory().getId()).orElseThrow( () -> new RuntimeException("Category not found"));
+        Category category = categoryRepository.findById(recurringExpense.getCategory().getId()).orElseThrow( () -> new ResourceNotFoundException("Category not found"));
 
         recurringExpense.setTitle(request.title());
         recurringExpense.setDescription(request.description());
@@ -68,7 +69,7 @@ public class RecurringExpenseService {
     }
 
     public List<RecurringExpenseResponse> getUserRecurringExpenseByCategory(User user, Integer categoryId) {
-        Category category = categoryRepository.findById(categoryId).orElseThrow( () -> new RuntimeException("Category not found"));
+        Category category = categoryRepository.findById(categoryId).orElseThrow( () -> new ResourceNotFoundException("Category not found"));
 
         List<RecurringExpense> recurringExpense = recurringExpenseRepository.findByUserAndCategory(user, category);
 
