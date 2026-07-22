@@ -19,30 +19,11 @@ public class CategoryService {
 
     // Business logic
     // Read
-    public List<CategoryResponse> getAllCategories() {
-        List<Category> allCategories = categoryRepository.findAll();
-
-        return allCategories.stream().map(this::mapToResponse).toList();
+    public List<Category> getAllCategories() {
+        return categoryRepository.findAll();
     }
 
-    public CategoryResponse getCategoryById(Integer categoryId) {
-        Category category =  categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-
-        return mapToResponse(category);
-    }
-
-    // Helper methods
-    // Map entity to response
-    private CategoryResponse mapToResponse(Category category) {
-        return new CategoryResponse(category.getId(), category.getCategoryName());
-    }
-
-    // Map request to entity
-    private Category mapToEntity(CategoryResponse request) {
-        return new Category(request.categoryName());
-    }
-
-    private Category getCategoryEntityById(Integer categoryId) {
+    public Category getCategoryById(Integer categoryId) {
         return categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
     }
 }
