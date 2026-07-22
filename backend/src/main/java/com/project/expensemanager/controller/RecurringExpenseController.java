@@ -2,8 +2,12 @@ package com.project.expensemanager.controller;
 
 import com.project.expensemanager.dto.recurringexpense.RecurringExpenseRequest;
 import com.project.expensemanager.dto.recurringexpense.RecurringExpenseResponse;
+import com.project.expensemanager.entity.Category;
 import com.project.expensemanager.entity.Frequency;
+import com.project.expensemanager.entity.RecurringExpense;
 import com.project.expensemanager.entity.User;
+import com.project.expensemanager.mapper.RecurringExpenseMapper;
+import com.project.expensemanager.service.CategoryService;
 import com.project.expensemanager.service.RecurringExpenseService;
 import com.project.expensemanager.service.UserService;
 import jakarta.validation.Valid;
@@ -20,10 +24,14 @@ public class RecurringExpenseController {
 
     private final UserService userService;
     private final RecurringExpenseService recurringExpenseService;
+    private final CategoryService categoryService;
+    private final RecurringExpenseMapper recurringExpenseMapper;
 
-    public RecurringExpenseController(UserService userService, RecurringExpenseService recurringExpenseService) {
+    public RecurringExpenseController(UserService userService, RecurringExpenseService recurringExpenseService, CategoryService categoryService, RecurringExpenseMapper recurringExpenseMapper) {
         this.userService = userService;
         this.recurringExpenseService = recurringExpenseService;
+        this.categoryService = categoryService;
+        this.recurringExpenseMapper = recurringExpenseMapper;
     }
 
     // Create
@@ -33,10 +41,12 @@ public class RecurringExpenseController {
             @Valid @RequestBody RecurringExpenseRequest request
     ) {
         User user = userService.getUserById(userId);
+        Category category = categoryService.getCategoryById(request.categoryId());
+        RecurringExpense recurringExpense = recurringExpenseMapper.mapToEntity(request, user, category);
+        RecurringExpense savedRecurringExpense = recurringExpenseService.createRecurringExpense(recurringExpense);
+        RecurringExpenseResponse response = recurringExpenseMapper.mapToResponse(savedRecurringExpense);
 
-        RecurringExpenseResponse recurringExpense = recurringExpenseService.createRecurringExpense(user, request);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(recurringExpense);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // Update
@@ -47,10 +57,12 @@ public class RecurringExpenseController {
             @Valid @RequestBody RecurringExpenseRequest request
     ) {
         User user = userService.getUserById(userId);
+        Category category = categoryService.getCategoryById(request.categoryId());
+        RecurringExpense recurringExpense = recurringExpenseMapper.mapToEntity(request, user, category);
+        RecurringExpense updatedExpense = recurringExpenseService.updateRecurringExpense(recurringExpenseId, user, recurringExpense);
+        RecurringExpenseResponse response = recurringExpenseMapper.mapToResponse(updatedExpense);
 
-        RecurringExpenseResponse updatedExpense = recurringExpenseService.updateRecurringExpense(recurringExpenseId, user, request);
-
-        return ResponseEntity.status(HttpStatus.OK).body(updatedExpense);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // Get all user recurring expenses
@@ -59,10 +71,10 @@ public class RecurringExpenseController {
             @RequestParam Integer userId
     ) {
         User user = userService.getUserById(userId);
+        List<RecurringExpense> expenses = recurringExpenseService.getAllUserRecurringExpenses(user);
+        List<RecurringExpenseResponse> response = expenses.stream().map(recurringExpenseMapper::mapToResponse).toList();
 
-        List<RecurringExpenseResponse> expenses = recurringExpenseService.getAllUserRecurringExpenses(user);
-
-        return ResponseEntity.status(HttpStatus.OK).body(expenses);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // Get recurring expense by ID
@@ -72,10 +84,10 @@ public class RecurringExpenseController {
             @PathVariable Integer recurringExpenseId
     ) {
         User user = userService.getUserById(userId);
+        RecurringExpense expense = recurringExpenseService.getUserRecurringExpenseById(user, recurringExpenseId);
+        RecurringExpenseResponse response = recurringExpenseMapper.mapToResponse(expense);
 
-        RecurringExpenseResponse expense = recurringExpenseService.getUserRecurringExpenseById(user, recurringExpenseId);
-
-        return ResponseEntity.status(HttpStatus.OK).body(expense);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // Search recurring expenses
@@ -87,15 +99,15 @@ public class RecurringExpenseController {
             @RequestParam(required = false) Integer categoryId
     ) {
         User user = userService.getUserById(userId);
-
-        List<RecurringExpenseResponse> expenses = recurringExpenseService.searchRecurringExpenses(
+        List<RecurringExpense> expenses = recurringExpenseService.searchRecurringExpenses(
                 user,
                 title,
                 categoryId,
                 frequency
         );
+        List<RecurringExpenseResponse> response = expenses.stream().map(recurringExpenseMapper::mapToResponse).toList();
 
-        return ResponseEntity.status(HttpStatus.OK).body(expenses);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // Filter recurring expenses by amount
@@ -106,10 +118,11 @@ public class RecurringExpenseController {
             @RequestParam BigDecimal maxAmount
     ) {
         User user = userService.getUserById(userId);
+        List<RecurringExpense> expenses = recurringExpenseService.filterRecurringExpensesByAmount(user, minAmount, maxAmount);
+        List<RecurringExpenseResponse> response = expenses.stream().map(recurringExpenseMapper::mapToResponse).toList();
 
-        List<RecurringExpenseResponse> expenses = recurringExpenseService.filterRecurringExpensesByAmount(user, minAmount, maxAmount);
 
-        return ResponseEntity.status(HttpStatus.OK).body(expenses);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // Delete
@@ -119,7 +132,6 @@ public class RecurringExpenseController {
             @PathVariable Integer recurringExpenseId
     ) {
         User user = userService.getUserById(userId);
-
         recurringExpenseService.deleteRecurringExpense(user, recurringExpenseId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);

@@ -2,7 +2,12 @@ package com.project.expensemanager.controller;
 
 import com.project.expensemanager.dto.expense.ExpenseRequest;
 import com.project.expensemanager.dto.expense.ExpenseResponse;
+import com.project.expensemanager.entity.Category;
+import com.project.expensemanager.entity.Expense;
 import com.project.expensemanager.entity.User;
+import com.project.expensemanager.mapper.BudgetMapper;
+import com.project.expensemanager.mapper.ExpenseMapper;
+import com.project.expensemanager.service.CategoryService;
 import com.project.expensemanager.service.ExpenseService;
 import com.project.expensemanager.service.UserService;
 import jakarta.validation.Valid;
@@ -20,10 +25,14 @@ public class ExpenseController {
 
     private final ExpenseService expenseService;
     private final UserService userService;
+    private final CategoryService categoryService;
+    private final ExpenseMapper expenseMapper;
 
-    public ExpenseController(ExpenseService expenseService, UserService userService) {
+    public ExpenseController(ExpenseService expenseService, UserService userService, CategoryService categoryService, ExpenseMapper expenseMapper) {
         this.expenseService = expenseService;
         this.userService = userService;
+        this.categoryService = categoryService;
+        this.expenseMapper = expenseMapper;
     }
 
     // Create
@@ -34,8 +43,10 @@ public class ExpenseController {
             ) {
                 // Call the service
                 User user = userService.getUserById(userId);
-
-                ExpenseResponse response = expenseService.createExpense(user, request);
+                Category category = categoryService.getCategoryById(request.categoryId());
+                Expense expense = expenseMapper.mapToEntity(request, user, category);
+                Expense  savedExpense = expenseService.createExpense(expense);
+                ExpenseResponse response = expenseMapper.mapToResponse(savedExpense);
 
                 // Return the response
                 return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -47,10 +58,10 @@ public class ExpenseController {
             @RequestParam Integer userId
     ) {
         User user = userService.getUserById(userId);
+        List<Expense> expenses = expenseService.getExpensesForUser(user);
+        List<ExpenseResponse> response = expenses.stream().map(expenseMapper::mapToResponse).toList();
 
-        List<ExpenseResponse> expenses = expenseService.getExpensesForUser(user);
-
-        return ResponseEntity.status(HttpStatus.OK).body(expenses);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // Get expense by ID
@@ -60,10 +71,10 @@ public class ExpenseController {
             @PathVariable Integer expenseId
     ) {
         User user = userService.getUserById(userId);
+        Expense expense = expenseService.getUserExpenseById(user, expenseId);
+        ExpenseResponse response = expenseMapper.mapToResponse(expense);
 
-        ExpenseResponse expense = expenseService.getUserExpenseById(user, expenseId);
-
-        return ResponseEntity.status(HttpStatus.OK).body(expense);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // Filter expenses
@@ -77,10 +88,10 @@ public class ExpenseController {
             @RequestParam(required = false) LocalDate end
             ) {
         User user = userService.getUserById(userId);
+        List<Expense> filteredExpenses = expenseService.filterExpenses(user, categoryId, minAmount, maxAmount, start, end);
+        List<ExpenseResponse> response = filteredExpenses.stream().map(expenseMapper::mapToResponse).toList();
 
-        List<ExpenseResponse> filteredExpenses = expenseService.filterExpenses(user, categoryId, minAmount, maxAmount, start, end);
-
-        return ResponseEntity.status(HttpStatus.OK).body(filteredExpenses);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
         }
 
      // Search expenses
@@ -93,16 +104,16 @@ public class ExpenseController {
         @RequestParam(required = false) Integer categoryId
     ) {
         User user = userService.getUserById(userId);
-
-        List<ExpenseResponse> expenses = expenseService.searchExpenses(
+        List<Expense> expenses = expenseService.searchExpenses(
                 user,
                 expenseDate,
                 title,
                 categoryId,
                 amount
         );
+        List<ExpenseResponse> response = expenses.stream().map(expenseMapper::mapToResponse).toList();
 
-        return ResponseEntity.status(HttpStatus.OK).body(expenses);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // Update
@@ -113,20 +124,21 @@ public class ExpenseController {
             @Valid @RequestBody ExpenseRequest request
     ) {
         User user = userService.getUserById(userId);
+        Category category = categoryService.getCategoryById(request.categoryId());
+        Expense expense = expenseMapper.mapToEntity(request, user, category);
+        Expense updatedExpense = expenseService.updateExpense(user, expenseId, expense);
+        ExpenseResponse response = expenseMapper.mapToResponse(updatedExpense);
 
-        ExpenseResponse updatedExpense = expenseService.updateExpense(expenseId, user, request);
-
-        return ResponseEntity.status(HttpStatus.OK).body(updatedExpense);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // Delete
     @DeleteMapping("/{expenseId}")
-    public ResponseEntity<ExpenseResponse> deleteExpense(
+    public ResponseEntity<Void> deleteExpense(
             @RequestParam Integer userId,
             @PathVariable Integer expenseId
     ) {
         User user = userService.getUserById(userId);
-
         expenseService.deleteExpense(user, expenseId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);

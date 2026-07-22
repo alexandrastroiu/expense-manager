@@ -3,7 +3,10 @@ package com.project.expensemanager.controller;
 import com.project.expensemanager.dto.budget.BudgetRequest;
 import com.project.expensemanager.dto.budget.BudgetResponse;
 import com.project.expensemanager.dto.budget.BudgetSummaryResponse;
+import com.project.expensemanager.entity.Budget;
 import com.project.expensemanager.entity.User;
+import com.project.expensemanager.mapper.BudgetMapper;
+import com.project.expensemanager.model.BudgetSummary;
 import com.project.expensemanager.service.BudgetService;
 import com.project.expensemanager.service.UserService;
 import jakarta.validation.Valid;
@@ -19,10 +22,12 @@ import java.time.LocalDate;
 public class BudgetController {
     private final BudgetService budgetService;
     private final UserService userService;
+    private final BudgetMapper budgetMapper;
 
-    public BudgetController(BudgetService budgetService, UserService userService) {
+    public BudgetController(BudgetService budgetService, UserService userService, BudgetMapper budgetMapper) {
         this.budgetService = budgetService;
         this.userService = userService;
+        this.budgetMapper = budgetMapper;
     }
 
     // Create
@@ -32,10 +37,11 @@ public class BudgetController {
             @Valid @RequestBody BudgetRequest request
             ) {
         User user = userService.getUserById(userId);
+        Budget budget = budgetMapper.mapToEntity(request, user);
+        Budget savedBudget = budgetService.createBudget(user, budget);
+        BudgetResponse response = budgetMapper.mapToResponse(savedBudget);
 
-        BudgetResponse budget = budgetService.createBudget(user, request);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(budget);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // Get budget by ID
@@ -45,10 +51,10 @@ public class BudgetController {
             @PathVariable Integer budgetId
     ) {
         User user = userService.getUserById(userId);
+        Budget budget = budgetService.getUserBudgetById(user, budgetId);
+        BudgetResponse response = budgetMapper.mapToResponse(budget);
 
-        BudgetResponse budget = budgetService.getUserBudgetById(user, budgetId);
-
-        return ResponseEntity.status(HttpStatus.OK).body(budget);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // Get budget by period
@@ -58,10 +64,10 @@ public class BudgetController {
             @RequestParam @DateTimeFormat LocalDate period
             ) {
             User user = userService.getUserById(userId);
+            Budget budget = budgetService.getUserBudgetByPeriod(user, period);
+            BudgetResponse response = budgetMapper.mapToResponse(budget);
 
-            BudgetResponse budget = budgetService.getUserBudgetByPeriod(user, period);
-
-            return ResponseEntity.status(HttpStatus.OK).body(budget);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // Budget summary
@@ -71,10 +77,10 @@ public class BudgetController {
            @RequestParam @DateTimeFormat LocalDate period
    ) {
        User user = userService.getUserById(userId);
+       BudgetSummary summary = budgetService.getBudgetSummary(user, period);
+       BudgetSummaryResponse  response = budgetMapper.mapSummaryToResponse(summary);
 
-       BudgetSummaryResponse summary = budgetService.getBudgetSummary(user, period);
-
-       return ResponseEntity.status(HttpStatus.OK).body(summary);
+       return ResponseEntity.status(HttpStatus.OK).body(response);
    }
 
     // Update
@@ -85,20 +91,20 @@ public class BudgetController {
             @Valid @RequestBody BudgetRequest request
     ) {
         User user = userService.getUserById(userId);
+        Budget budget = budgetMapper.mapToEntity(request, user);
+        Budget updatedBudget = budgetService.updateBudget(user, budgetId, budget);
+        BudgetResponse response = budgetMapper.mapToResponse(updatedBudget);
 
-        BudgetResponse budget = budgetService.updateBudget(user, budgetId, request);
-
-        return ResponseEntity.status(HttpStatus.OK).body(budget);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // Delete
     @DeleteMapping("/{budgetId}")
-    public ResponseEntity<BudgetResponse> deleteBudget(
+    public ResponseEntity<Void> deleteBudget(
             @RequestParam Integer userId,
             @PathVariable Integer budgetId
     ) {
         User user = userService.getUserById(userId);
-
         budgetService.deleteBudget(user, budgetId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);

@@ -1,6 +1,8 @@
 package com.project.expensemanager.controller;
 
 import com.project.expensemanager.dto.category.CategoryResponse;
+import com.project.expensemanager.entity.Category;
+import com.project.expensemanager.mapper.CategoryMapper;
 import com.project.expensemanager.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,16 +15,19 @@ import java.util.List;
 @RequestMapping("/api/categories")   // Base URL
 public class CategoryController {
     private final CategoryService categoryService;
+    private final CategoryMapper categoryMapper;
 
-    public CategoryController(CategoryService categoryService) {
+    public CategoryController(CategoryService categoryService, CategoryMapper categoryMapper) {
         this.categoryService = categoryService;
+        this.categoryMapper = categoryMapper;
     }
 
     // Get all categories
     public ResponseEntity<List<CategoryResponse>> getAllCategories() {
-        List<CategoryResponse> categories = categoryService.getAllCategories();
+        List<Category> categories = categoryService.getAllCategories();
+        List<CategoryResponse> response = categories.stream().map(categoryMapper::mapToResponse).toList();
 
-        return ResponseEntity.status(HttpStatus.OK).body(categories);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }
