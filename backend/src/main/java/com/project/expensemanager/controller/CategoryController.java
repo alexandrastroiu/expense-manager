@@ -6,6 +6,7 @@ import com.project.expensemanager.mapper.CategoryMapper;
 import com.project.expensemanager.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +24,7 @@ public class CategoryController {
     }
 
     // Get all categories
+    @GetMapping
     public ResponseEntity<List<CategoryResponse>> getAllCategories() {
         List<Category> categories = categoryService.getAllCategories();
         List<CategoryResponse> response = categories.stream().map(categoryMapper::mapToResponse).toList();
