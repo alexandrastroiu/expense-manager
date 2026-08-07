@@ -5,7 +5,9 @@ import com.project.expensemanager.dto.expense.ExpenseResponse;
 import com.project.expensemanager.entity.Category;
 import com.project.expensemanager.entity.Expense;
 import com.project.expensemanager.entity.User;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ExpenseMapper {
 
     // Map entity to response

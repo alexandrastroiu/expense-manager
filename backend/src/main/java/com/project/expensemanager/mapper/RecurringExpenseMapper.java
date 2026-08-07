@@ -5,7 +5,9 @@ import com.project.expensemanager.dto.recurringexpense.RecurringExpenseResponse;
 import com.project.expensemanager.entity.Category;
 import com.project.expensemanager.entity.RecurringExpense;
 import com.project.expensemanager.entity.User;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RecurringExpenseMapper {
 
     // Map entity to response

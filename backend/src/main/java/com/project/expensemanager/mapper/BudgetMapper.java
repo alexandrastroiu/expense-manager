@@ -6,7 +6,9 @@ import com.project.expensemanager.dto.budget.BudgetSummaryResponse;
 import com.project.expensemanager.entity.Budget;
 import com.project.expensemanager.entity.User;
 import com.project.expensemanager.model.BudgetSummary;
+import org.springframework.stereotype.Component;
 
+@Component
 public class BudgetMapper {
 
     // Map entity to response
