@@ -7,6 +7,7 @@ import com.project.expensemanager.entity.Budget;
 import com.project.expensemanager.entity.Expense;
 import com.project.expensemanager.entity.RecurringExpense;
 import com.project.expensemanager.entity.User;
+import com.project.expensemanager.exception.BudgetExistsException;
 import com.project.expensemanager.exception.ResourceNotFoundException;
 import com.project.expensemanager.model.BudgetSummary;
 import com.project.expensemanager.repository.BudgetRepository;
@@ -39,6 +40,10 @@ public class BudgetService {
         LocalDate date = budget.getBudgetPeriod().withDayOfMonth(1);        // Allow only one monthly budget
         Budget savedBudget = new Budget(user, budget.getAmount(), date);
 
+        if (budgetRepository.existsByUserAndBudgetPeriod(user, date)) {
+            throw new BudgetExistsException("Budget already exists for this month.");
+        }
+
         return budgetRepository.save(savedBudget);
     }
 
@@ -55,6 +60,10 @@ public class BudgetService {
     public Budget updateBudget(User user, Integer budgetId, Budget updatedBudget) {
         Budget budget = getUserBudgetById(user, budgetId);
         LocalDate budgetPeriod = updatedBudget.getBudgetPeriod().withDayOfMonth(1);
+
+        if (budgetRepository.existsByUserAndBudgetPeriod(user, budgetPeriod) && !budgetPeriod.isEqual(budget.getBudgetPeriod())) {
+                throw new BudgetExistsException("A different budget already exists for this month.");
+        }
 
         budget.setAmount(updatedBudget.getAmount());
         budget.setBudgetPeriod(budgetPeriod);

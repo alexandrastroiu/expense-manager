@@ -13,4 +13,6 @@ public interface BudgetRepository extends JpaRepository<Budget, Integer> {
     Optional<Budget> findByUserAndId(User user, Integer budgetId);
 
     Optional<Budget> findByUserAndBudgetPeriod(User user, LocalDate period);
+
+    boolean existsByUserAndBudgetPeriod(User user, LocalDate period);
 }
