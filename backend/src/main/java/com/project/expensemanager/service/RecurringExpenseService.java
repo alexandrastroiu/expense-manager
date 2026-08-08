@@ -6,12 +6,15 @@ import com.project.expensemanager.entity.Category;
 import com.project.expensemanager.entity.Frequency;
 import com.project.expensemanager.entity.RecurringExpense;
 import com.project.expensemanager.entity.User;
+import com.project.expensemanager.exception.InvalidRequestException;
 import com.project.expensemanager.exception.ResourceNotFoundException;
 import com.project.expensemanager.repository.CategoryRepository;
 import com.project.expensemanager.repository.RecurringExpenseRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -30,6 +33,8 @@ public class RecurringExpenseService {
     public RecurringExpense createRecurringExpense(RecurringExpense recurringExpense) {
         Category category = categoryRepository.findById(recurringExpense.getCategory().getId()).orElseThrow( () -> new ResourceNotFoundException("Category not found"));
 
+        validateDate(recurringExpense.getEndDate(), recurringExpense.getStartDate());
+
         return recurringExpenseRepository.save(recurringExpense);
     }
 
@@ -38,6 +43,8 @@ public class RecurringExpenseService {
         RecurringExpense recurringExpense = getUserRecurringExpenseById(user, recurringExpenseId);
 
         Category category = categoryRepository.findById(recurringExpense.getCategory().getId()).orElseThrow( () -> new ResourceNotFoundException("Category not found"));
+
+        validateDate(updatedRecurringExpense.getEndDate(), updatedRecurringExpense.getStartDate());
 
         recurringExpense.setTitle(updatedRecurringExpense.getTitle());
         recurringExpense.setDescription(updatedRecurringExpense.getDescription());
@@ -99,6 +106,9 @@ public class RecurringExpenseService {
 
     // Filter
     public List<RecurringExpense> filterRecurringExpensesByAmount(User user, BigDecimal minAmount, BigDecimal maxAmount) {
+        if (minAmount != null && maxAmount != null && minAmount.compareTo(maxAmount) > 0) {
+            throw new InvalidRequestException("Minimum amount cannot be greater than maximum amount");
+        }
        return recurringExpenseRepository.findByUserAndAmountBetween(user, minAmount, maxAmount);
     }
 
@@ -107,5 +117,11 @@ public class RecurringExpenseService {
     RecurringExpense recurringExpense = getUserRecurringExpenseById(user, recurringExpenseId);
     recurringExpenseRepository.delete(recurringExpense);
     }
-    
+
+    // Helper method
+    private void validateDate(LocalDate endDate, LocalDate startDate) {
+        if (endDate != null && endDate.isBefore(startDate)) {
+            throw new InvalidRequestException("End date cannot be before start date");
+        }
+    }
 }

@@ -5,6 +5,7 @@ import com.project.expensemanager.dto.expense.ExpenseResponse;
 import com.project.expensemanager.entity.Category;
 import com.project.expensemanager.entity.Expense;
 import com.project.expensemanager.entity.User;
+import com.project.expensemanager.exception.InvalidRequestException;
 import com.project.expensemanager.exception.ResourceNotFoundException;
 import com.project.expensemanager.exception.UnauthorizedAccessException;
 import com.project.expensemanager.repository.CategoryRepository;
@@ -101,10 +102,12 @@ public class ExpenseService {
             Category selectedCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category not found."));
 
             if (start != null && end != null && minAmount != null && maxAmount != null) {
+                validateDate(end, start);
                 return expenseRepository.findByUserAndCategoryAndExpenseDateBetweenAndAmountBetween(user, selectedCategory, start, end, minAmount, maxAmount);
             }
 
             if (start != null && end != null) {
+                validateDate(end, start);
                 return expenseRepository.findByUserAndCategoryAndExpenseDateBetween(user, selectedCategory, start, end);
             }
 
@@ -124,10 +127,12 @@ public class ExpenseService {
         }
         else {
             if (start != null && end != null && minAmount != null && maxAmount != null) {
+                validateDate(end, start);
                 return expenseRepository.findByUserAndExpenseDateBetweenAndAmountBetween(user, start, end, minAmount, maxAmount);
             }
 
             if (start != null && end != null) {
+                validateDate(end, start);
                 return expenseRepository.findByUserAndExpenseDateBetween(user, start, end);
             }
 
@@ -169,4 +174,16 @@ public class ExpenseService {
         expenseRepository.delete(expense);
     }
 
+    // Helper methods
+    private void validateDate(LocalDate endDate, LocalDate startDate) {
+        if (endDate != null && endDate.isBefore(startDate)) {
+            throw new InvalidRequestException("End date cannot be before start date");
+        }
+    }
+
+    private void validateAmount(BigDecimal minAmount, BigDecimal maxAmount) {
+        if (minAmount != null && maxAmount != null && minAmount.compareTo(maxAmount) > 0) {
+            throw new InvalidRequestException("Minimum amount cannot be greater than maximum amount");
+        }
+    }
 }
