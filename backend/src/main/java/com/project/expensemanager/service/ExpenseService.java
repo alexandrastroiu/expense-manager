@@ -103,11 +103,13 @@ public class ExpenseService {
 
             if (start != null && end != null && minAmount != null && maxAmount != null) {
                 validateDate(end, start);
+                validateAmount(minAmount, maxAmount);
                 return expenseRepository.findByUserAndCategoryAndExpenseDateBetweenAndAmountBetween(user, selectedCategory, start, end, minAmount, maxAmount);
             }
 
             if (start != null && end != null) {
                 validateDate(end, start);
+                validateAmount(minAmount, maxAmount);
                 return expenseRepository.findByUserAndCategoryAndExpenseDateBetween(user, selectedCategory, start, end);
             }
 
@@ -120,6 +122,7 @@ public class ExpenseService {
             }
 
             if ( minAmount != null && maxAmount != null) {
+                validateAmount(minAmount, maxAmount);
                 return expenseRepository.findByUserAndCategoryAndAmountBetween(user, selectedCategory, minAmount, maxAmount);
             }
 
@@ -128,6 +131,7 @@ public class ExpenseService {
         else {
             if (start != null && end != null && minAmount != null && maxAmount != null) {
                 validateDate(end, start);
+                validateAmount(minAmount, maxAmount);
                 return expenseRepository.findByUserAndExpenseDateBetweenAndAmountBetween(user, start, end, minAmount, maxAmount);
             }
 
@@ -145,6 +149,7 @@ public class ExpenseService {
             }
 
             if (minAmount != null && maxAmount != null) {
+                validateAmount(minAmount, maxAmount);
                 return expenseRepository.findByUserAndAmountBetween(user, minAmount, maxAmount);
             }
         }
