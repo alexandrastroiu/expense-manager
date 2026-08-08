@@ -48,7 +48,7 @@ public class BudgetService {
     }
 
     public Budget getUserBudgetByPeriod(User user, LocalDate period) {
-        return budgetRepository.findByUserAndPeriod(user, period).orElseThrow(() -> new ResourceNotFoundException("Budget not found"));
+        return budgetRepository.findByUserAndBudgetPeriod(user, period).orElseThrow(() -> new ResourceNotFoundException("Budget not found"));
     }
 
     // Update
