@@ -28,6 +28,6 @@ public class UserService {
 
     public User getUserById(Integer userId) {
         return userRepository.findById(userId)
-                .orElseThrow( () -> new ResourceNotFoundException("User with email not found"));
+                .orElseThrow( () -> new ResourceNotFoundException("User not found"));
     }
 }
