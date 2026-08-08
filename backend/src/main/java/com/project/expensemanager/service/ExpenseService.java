@@ -30,8 +30,6 @@ public class ExpenseService {
     // Business logic
     // Create
     public Expense createExpense(Expense expense) {
-        Category selectedCategory = categoryRepository.findById(expense.getId()).orElseThrow(() -> new ResourceNotFoundException("Category not found."));
-
         return expenseRepository.save(expense);
     }
 
