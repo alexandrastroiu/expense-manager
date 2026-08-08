@@ -52,18 +52,6 @@ public class ExpenseController {
                 return ResponseEntity.status(HttpStatus.CREATED).body(response);
             }
 
-    // Get all user expenses
-    @GetMapping
-    public ResponseEntity<List<ExpenseResponse>> getAllExpenses(
-            @RequestParam Integer userId
-    ) {
-        User user = userService.getUserById(userId);
-        List<Expense> expenses = expenseService.getExpensesForUser(user);
-        List<ExpenseResponse> response = expenses.stream().map(expenseMapper::mapToResponse).toList();
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
     // Get expense by ID
     @GetMapping("/{expenseId}")
     public ResponseEntity<ExpenseResponse> getExpenseById(
