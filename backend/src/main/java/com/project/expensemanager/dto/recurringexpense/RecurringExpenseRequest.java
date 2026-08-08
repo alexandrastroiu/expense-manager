@@ -26,7 +26,6 @@ public record RecurringExpenseRequest(
         @NotNull(message = "Start date is required")
         LocalDate startDate,
 
-        @NotNull(message = "End date is required")
         LocalDate endDate,
 
         @NotNull(message = "Frequency is required")
