@@ -1,5 +1,6 @@
 package com.project.expensemanager.controller;
 
+import com.project.expensemanager.dto.auth.LoginRequest;
 import com.project.expensemanager.dto.auth.RegisterRequest;
 import com.project.expensemanager.entity.User;
 import com.project.expensemanager.mapper.UserMapper;
@@ -33,5 +34,14 @@ public class AuthController {
         authService.register(user, request.password());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Void> login(
+            @Valid @RequestBody LoginRequest request
+    ) {
+        authService.login(request.username(), request.password());
+
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 }
