@@ -1,4 +1,4 @@
-package com.project.expensemanager.config;
+package com.project.expensemanager.security;
 
 import com.project.expensemanager.entity.User;
 import com.project.expensemanager.exception.ResourceNotFoundException;
