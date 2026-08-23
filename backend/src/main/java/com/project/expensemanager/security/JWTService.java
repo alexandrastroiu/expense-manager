@@ -1,10 +1,8 @@
 package com.project.expensemanager.security;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -36,5 +34,32 @@ public class JWTService {
                 .expiration(new Date((new Date()).getTime() + jwtExpirationTime))
                 .signWith(key)
                 .compact();
+    }
+
+    public String extractUsernameFromToken(String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+    }
+
+    public Date extractExpirationDateFromToken(String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getExpiration();
+    }
+
+    public boolean isValidToken(String token, UserDetails userDetails) {
+        return extractUsernameFromToken(token).equals(userDetails.getUsername()) && !isExpiredToken(token);
+    }
+
+    // Helper method
+    private boolean isExpiredToken(String token) {
+        return extractExpirationDateFromToken(token).before(new Date());
     }
 }
