@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -33,10 +34,11 @@ public class BudgetController {
     // Create
     @PostMapping
     public ResponseEntity<BudgetResponse> createBudget(
-            @RequestParam Integer userId,
+            Authentication authentication,
             @Valid @RequestBody BudgetRequest request
             ) {
-        User user = userService.getUserById(userId);
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
         Budget budget = budgetMapper.mapToEntity(request, user);
         Budget savedBudget = budgetService.createBudget(user, budget);
         BudgetResponse response = budgetMapper.mapToResponse(savedBudget);
@@ -47,10 +49,11 @@ public class BudgetController {
     // Get budget by ID
     @GetMapping("/{budgetId}")
     public ResponseEntity<BudgetResponse> getBudgetById(
-            @RequestParam Integer userId,
+            Authentication authentication,
             @PathVariable Integer budgetId
     ) {
-        User user = userService.getUserById(userId);
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
         Budget budget = budgetService.getUserBudgetById(user, budgetId);
         BudgetResponse response = budgetMapper.mapToResponse(budget);
 
@@ -60,10 +63,11 @@ public class BudgetController {
     // Get budget by period
     @GetMapping
     public ResponseEntity<BudgetResponse> getBudgetByPeriod(
-            @RequestParam Integer userId,
+            Authentication authentication,
             @RequestParam @DateTimeFormat LocalDate period
             ) {
-            User user = userService.getUserById(userId);
+            String username = authentication.getName();
+            User user = userService.getUserByUsername(username);
             Budget budget = budgetService.getUserBudgetByPeriod(user, period);
             BudgetResponse response = budgetMapper.mapToResponse(budget);
 
@@ -73,10 +77,11 @@ public class BudgetController {
     // Budget summary
    @GetMapping("/summary")
    public ResponseEntity<BudgetSummaryResponse> getBudgetSummary(
-           @RequestParam Integer userId,
+           Authentication authentication,
            @RequestParam @DateTimeFormat LocalDate period
    ) {
-       User user = userService.getUserById(userId);
+       String username = authentication.getName();
+       User user = userService.getUserByUsername(username);
        BudgetSummary summary = budgetService.getBudgetSummary(user, period);
        BudgetSummaryResponse  response = budgetMapper.mapSummaryToResponse(summary);
 
@@ -86,11 +91,12 @@ public class BudgetController {
     // Update
     @PutMapping("/{budgetId}")
     public ResponseEntity<BudgetResponse> updateBudget(
-            @RequestParam Integer userId,
+            Authentication authentication,
             @PathVariable Integer budgetId,
             @Valid @RequestBody BudgetRequest request
     ) {
-        User user = userService.getUserById(userId);
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
         Budget budget = budgetMapper.mapToEntity(request, user);
         Budget updatedBudget = budgetService.updateBudget(user, budgetId, budget);
         BudgetResponse response = budgetMapper.mapToResponse(updatedBudget);
@@ -101,10 +107,11 @@ public class BudgetController {
     // Delete
     @DeleteMapping("/{budgetId}")
     public ResponseEntity<Void> deleteBudget(
-            @RequestParam Integer userId,
+            Authentication authentication,
             @PathVariable Integer budgetId
     ) {
-        User user = userService.getUserById(userId);
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
         budgetService.deleteBudget(user, budgetId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
