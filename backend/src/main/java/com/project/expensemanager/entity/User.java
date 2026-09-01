@@ -36,6 +36,13 @@ public class User {
         this.email = email;
     }
 
+    public User(String username, String firstName, String lastName, String email) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+    }
+
     // Getters and Setters
     public String getUsername() {
         return username;

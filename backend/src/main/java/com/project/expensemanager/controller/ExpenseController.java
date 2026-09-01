@@ -13,6 +13,7 @@ import com.project.expensemanager.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -38,11 +39,12 @@ public class ExpenseController {
     // Create
     @PostMapping
     public ResponseEntity<ExpenseResponse> createExpense(
-            @RequestParam Integer userId,
+            Authentication authentication,
             @Valid @RequestBody ExpenseRequest request
             ) {
+                String username = authentication.getName();
                 // Call the service
-                User user = userService.getUserById(userId);
+                User user = userService.getUserByUsername(username);
                 Category category = categoryService.getCategoryById(request.categoryId());
                 Expense expense = expenseMapper.mapToEntity(request, user, category);
                 Expense  savedExpense = expenseService.createExpense(expense);
@@ -55,10 +57,11 @@ public class ExpenseController {
     // Get expense by ID
     @GetMapping("/{expenseId}")
     public ResponseEntity<ExpenseResponse> getExpenseById(
-            @RequestParam Integer userId,
+            Authentication authentication,
             @PathVariable Integer expenseId
     ) {
-        User user = userService.getUserById(userId);
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
         Expense expense = expenseService.getUserExpenseById(user, expenseId);
         ExpenseResponse response = expenseMapper.mapToResponse(expense);
 
@@ -68,14 +71,15 @@ public class ExpenseController {
     // Filter expenses
     @GetMapping
     public ResponseEntity<List<ExpenseResponse>> getExpenses(
-            @RequestParam Integer userId,
+            Authentication authentication,
             @RequestParam(required = false) Integer categoryId,
             @RequestParam(required = false) BigDecimal minAmount,
             @RequestParam(required = false) BigDecimal maxAmount,
             @RequestParam(required = false) LocalDate start,
             @RequestParam(required = false) LocalDate end
             ) {
-        User user = userService.getUserById(userId);
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
         List<Expense> filteredExpenses = expenseService.filterExpenses(user, categoryId, minAmount, maxAmount, start, end);
         List<ExpenseResponse> response = filteredExpenses.stream().map(expenseMapper::mapToResponse).toList();
 
@@ -85,13 +89,14 @@ public class ExpenseController {
      // Search expenses
     @GetMapping("/search")
     public ResponseEntity<List<ExpenseResponse>> searchExpenses (
-        @RequestParam Integer userId,
+        Authentication authentication,
         @RequestParam(required = false) String title,
         @RequestParam(required = false) LocalDate expenseDate,
         @RequestParam(required = false) BigDecimal amount,
         @RequestParam(required = false) Integer categoryId
     ) {
-        User user = userService.getUserById(userId);
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
         List<Expense> expenses = expenseService.searchExpenses(
                 user,
                 expenseDate,
@@ -107,11 +112,12 @@ public class ExpenseController {
     // Update
     @PutMapping("/{expenseId}")
     public ResponseEntity<ExpenseResponse> updateExpense(
-            @RequestParam Integer userId,
+            Authentication authentication,
             @PathVariable Integer expenseId,
             @Valid @RequestBody ExpenseRequest request
     ) {
-        User user = userService.getUserById(userId);
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
         Category category = categoryService.getCategoryById(request.categoryId());
         Expense expense = expenseMapper.mapToEntity(request, user, category);
         Expense updatedExpense = expenseService.updateExpense(user, expenseId, expense);
@@ -123,13 +129,13 @@ public class ExpenseController {
     // Delete
     @DeleteMapping("/{expenseId}")
     public ResponseEntity<Void> deleteExpense(
-            @RequestParam Integer userId,
+            Authentication authentication,
             @PathVariable Integer expenseId
     ) {
-        User user = userService.getUserById(userId);
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
         expenseService.deleteExpense(user, expenseId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
-
 }

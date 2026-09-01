@@ -13,6 +13,7 @@ import com.project.expensemanager.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -37,10 +38,11 @@ public class RecurringExpenseController {
     // Create
     @PostMapping
     public ResponseEntity<RecurringExpenseResponse> createRecurringExpense(
-            @RequestParam Integer userId,
+            Authentication authentication,
             @Valid @RequestBody RecurringExpenseRequest request
     ) {
-        User user = userService.getUserById(userId);
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
         Category category = categoryService.getCategoryById(request.categoryId());
         RecurringExpense recurringExpense = recurringExpenseMapper.mapToEntity(request, user, category);
         RecurringExpense savedRecurringExpense = recurringExpenseService.createRecurringExpense(recurringExpense);
@@ -52,11 +54,12 @@ public class RecurringExpenseController {
     // Update
     @PutMapping("/{recurringExpenseId}")
     public ResponseEntity<RecurringExpenseResponse> updateRecurringExpense(
-            @RequestParam Integer userId,
+            Authentication authentication,
             @PathVariable Integer recurringExpenseId,
             @Valid @RequestBody RecurringExpenseRequest request
     ) {
-        User user = userService.getUserById(userId);
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
         Category category = categoryService.getCategoryById(request.categoryId());
         RecurringExpense recurringExpense = recurringExpenseMapper.mapToEntity(request, user, category);
         RecurringExpense updatedExpense = recurringExpenseService.updateRecurringExpense(recurringExpenseId, user, recurringExpense);
@@ -68,9 +71,10 @@ public class RecurringExpenseController {
     // Get all user recurring expenses
     @GetMapping
     public ResponseEntity<List<RecurringExpenseResponse>> getAllRecurringExpenses(
-            @RequestParam Integer userId
+            Authentication authentication
     ) {
-        User user = userService.getUserById(userId);
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
         List<RecurringExpense> expenses = recurringExpenseService.getAllUserRecurringExpenses(user);
         List<RecurringExpenseResponse> response = expenses.stream().map(recurringExpenseMapper::mapToResponse).toList();
 
@@ -80,10 +84,11 @@ public class RecurringExpenseController {
     // Get recurring expense by ID
     @GetMapping("/{recurringExpenseId}")
     public ResponseEntity<RecurringExpenseResponse> getExpenseById(
-            @RequestParam Integer userId,
+            Authentication authentication,
             @PathVariable Integer recurringExpenseId
     ) {
-        User user = userService.getUserById(userId);
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
         RecurringExpense expense = recurringExpenseService.getUserRecurringExpenseById(user, recurringExpenseId);
         RecurringExpenseResponse response = recurringExpenseMapper.mapToResponse(expense);
 
@@ -93,12 +98,13 @@ public class RecurringExpenseController {
     // Search recurring expenses
     @GetMapping("/search")
     public ResponseEntity<List<RecurringExpenseResponse>> searchRecurringExpenses (
-            @RequestParam Integer userId,
+            Authentication authentication,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) Frequency frequency,
             @RequestParam(required = false) Integer categoryId
     ) {
-        User user = userService.getUserById(userId);
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
         List<RecurringExpense> expenses = recurringExpenseService.searchRecurringExpenses(
                 user,
                 title,
@@ -113,11 +119,12 @@ public class RecurringExpenseController {
     // Filter recurring expenses by amount
     @GetMapping("/filter")
     public ResponseEntity<List<RecurringExpenseResponse>> filterRecurringExpenses (
-            @RequestParam Integer userId,
+            Authentication authentication,
             @RequestParam BigDecimal minAmount,
             @RequestParam BigDecimal maxAmount
     ) {
-        User user = userService.getUserById(userId);
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
         List<RecurringExpense> expenses = recurringExpenseService.filterRecurringExpensesByAmount(user, minAmount, maxAmount);
         List<RecurringExpenseResponse> response = expenses.stream().map(recurringExpenseMapper::mapToResponse).toList();
 
@@ -128,13 +135,13 @@ public class RecurringExpenseController {
     // Delete
     @DeleteMapping("/{recurringExpenseId}")
     public ResponseEntity<Void> deleteRecurringExpense(
-            @RequestParam Integer userId,
+            Authentication authentication,
             @PathVariable Integer recurringExpenseId
     ) {
-        User user = userService.getUserById(userId);
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
         recurringExpenseService.deleteRecurringExpense(user, recurringExpenseId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
-
 }
