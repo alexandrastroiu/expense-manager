@@ -13,5 +13,16 @@ services:
     volumes:
       - database_data:/var/lib/postgresql/data
 
+  backend:
+    build: ./backend
+    container_name: expense_manager_backend
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://expense_manager_db:5432/expense_manager
+      - JWT_SECRET=${JWT_SECRET}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
+
 volumes:
   database_data:
