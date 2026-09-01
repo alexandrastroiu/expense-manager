@@ -8,10 +8,10 @@
   },
   "item": [
     {
-      "name": "Expenses",
+      "name": "Authentication",
       "item": [
         {
-          "name": "Create Expense",
+          "name": "Register user",
           "event": [
             {
               "listen": "test",
@@ -19,22 +19,6 @@
                 "exec": [
                   "pm.test(\"Status code is 201\", function () {",
                   "    pm.response.to.have.status(201);",
-                  "});",
-                  "",
-                  "const response = pm.response.json();",
-                  "",
-                  "pm.environment.set(\"expenseId\", response.id);",
-                  "",
-                  "pm.test(\"Expense has an ID\", function(){",
-                  "    pm.expect(response.id).to.exist;",
-                  "});",
-                  "",
-                  "pm.test(\"Expense title is correct\", function () {",
-                  "    pm.expect(response.title).to.eql(\"Groceries\");",
-                  "});",
-                  "",
-                  "pm.test(\"Expense amount is correct\", function () {",
-                  "    pm.expect(response.amount).to.eql(125.50);",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -44,65 +28,14 @@
             }
           ],
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"title\": \"Groceries\",\n    \"description\": \"Weekly groceries\",\n    \"amount\": 125.50,\n    \"categoryId\": 1,\n    \"expenseDate\": \"2026-08-07\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+            "auth": {
+              "type": "noauth"
             },
-            "url": {
-              "raw": "{{baseUrl}}/api/expenses?userId={{userId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "expenses"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Missing title",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 500\", function () {",
-                  "    pm.response.to.have.status(500);",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"description\": \"Weekly groceries\",\n    \"amount\": 125.50,\n    \"categoryId\": 1,\n    \"expenseDate\": \"2026-08-07\"\n}",
+              "raw": "{\n    \"username\": \"test_user\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Smith\",\n    \"password\": \"user123\",\n    \"email\": \"johnsmith@gmail.com\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -110,33 +43,28 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/expenses?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/auth/register",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
-                "expenses"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
+                "auth",
+                "register"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "Invalid amount",
+          "name": "Duplicate email",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Status code is 500\", function () {",
-                  "    pm.response.to.have.status(500);",
+                  "pm.test(\"Status code is 409\", function () {",
+                  "    pm.response.to.have.status(409);",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -146,11 +74,14 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"title\": \"Groceries\",\n    \"description\": \"Weekly groceries\",\n    \"amount\": -1,\n    \"categoryId\": 1,\n    \"expenseDate\": \"2026-08-07\"\n}",
+              "raw": "{\n    \"username\": \"test_user\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Smith\",\n    \"password\": \"user123\",\n    \"email\": \"johnsmith@gmail.com\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -158,33 +89,28 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/expenses?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/auth/register",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
-                "expenses"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
+                "auth",
+                "register"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "Missing category",
+          "name": "Duplicate username",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Status code is 500\", function () {",
-                  "    pm.response.to.have.status(500);",
+                  "pm.test(\"Status code is 409\", function () {",
+                  "    pm.response.to.have.status(409);",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -194,11 +120,14 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"title\": \"Groceries\",\n    \"description\": \"Weekly groceries\",\n    \"amount\": 125.50,\n    \"expenseDate\": \"2026-08-07\"\n}",
+              "raw": "{\n    \"username\": \"test_user\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Smith\",\n    \"password\": \"user123\",\n    \"email\": \"johnsmith@gmail.com\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -206,87 +135,126 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/expenses?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/auth/register",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
-                "expenses"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
+                "auth",
+                "register"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "Missing date",
+          "name": "Successful login",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Status code is 500\", function () {",
-                  "    pm.response.to.have.status(201);",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"title\": \"Groceries\",\n    \"description\": \"Weekly groceries\",\n    \"amount\": 125.50,\n    \"categoryId\": 1\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/expenses?userId={{userId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "expenses"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Expense by ID",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function() {",
+                  "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
                   "});",
                   "",
                   "const response = pm.response.json();",
                   "",
-                  "pm.test(\"ID is correct\", function () {",
-                  "    pm.expect(response.id).to.eql(pm.environment.get(\"expenseId\"));",
+                  "pm.environment.set(\"token\", response.token);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"test_user\",\n    \"password\": \"user123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid username or password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.expect(pm.response.json().message).to.eql(\"Bad credentials\");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"test_user\",\n    \"password\": \"1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Request protected endpoint without token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -296,284 +264,33 @@
             }
           ],
           "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/expenses/{{expenseId}}?userId={{userId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "expenses",
-                "{{expenseId}}"
-              ],
-              "query": [
+            "auth": {
+              "type": "bearer",
+              "bearer": [
                 {
-                  "key": "userId",
-                  "value": "{{userId}}"
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
                 }
               ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Search expense",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () { ",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "const response = pm.response.json();",
-                  "",
-                  "pm.test(\"Expense title is correct\", function () {",
-                  "    pm.expect(response[0].title).to.eql(\"Groceries\");",
-                  "});",
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/expenses/search?userId={{userId}}&title=Groceries",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "expenses",
-                "search"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                },
-                {
-                  "key": "title",
-                  "value": "Groceries"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Filter expenses",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () { ",
-                  "        pm.response.to.have.status(200); ",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/expenses?userId={{userId}}&categoryId=1&minAmount=100&maxAmount=150&start=2026-08-03&end=2026-08-07",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "expenses"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                },
-                {
-                  "key": "categoryId",
-                  "value": "1"
-                },
-                {
-                  "key": "minAmount",
-                  "value": "100"
-                },
-                {
-                  "key": "maxAmount",
-                  "value": "150"
-                },
-                {
-                  "key": "start",
-                  "value": "2026-08-03"
-                },
-                {
-                  "key": "end",
-                  "value": "2026-08-07"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Invalid filter amount",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 400\", function () {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "",
-                  "pm.test(\"Error message is correct\", function () {",
-                  "    pm.expect(pm.response.json().error).to.eql(\"Bad Request\");",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
+            },
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/expenses?userId={{userId}}&categoryId=1&minAmount=100&maxAmount=15&start=2026-08-03&end=2026-08-07",
+              "raw": "{{baseUrl}}/api/expenses",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "expenses"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                },
-                {
-                  "key": "categoryId",
-                  "value": "1"
-                },
-                {
-                  "key": "minAmount",
-                  "value": "100"
-                },
-                {
-                  "key": "maxAmount",
-                  "value": "15"
-                },
-                {
-                  "key": "start",
-                  "value": "2026-08-03"
-                },
-                {
-                  "key": "end",
-                  "value": "2026-08-07"
-                }
               ]
             }
           },
           "response": []
         },
         {
-          "name": "Invalid filter date",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 400\", function () {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "",
-                  "pm.test(\"Error message is correct\", function () {",
-                  "    pm.expect(pm.response.json().error).to.eql(\"Bad Request\");",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/expenses?userId={{userId}}&categoryId=1&minAmount=100&maxAmount=15&start=2026-08-03&end=2026-08-01",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "expenses"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                },
-                {
-                  "key": "categoryId",
-                  "value": "1"
-                },
-                {
-                  "key": "minAmount",
-                  "value": "100"
-                },
-                {
-                  "key": "maxAmount",
-                  "value": "15"
-                },
-                {
-                  "key": "start",
-                  "value": "2026-08-03"
-                },
-                {
-                  "key": "end",
-                  "value": "2026-08-01"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Update expense",
+          "name": "Request protected endpoint with token",
           "event": [
             {
               "listen": "test",
@@ -590,135 +307,33 @@
             }
           ],
           "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"title\": \"Updated expense\",\n    \"description\": \"Weekly groceries\",\n    \"amount\": 200.00,\n    \"categoryId\": 1,\n    \"expenseDate\": \"2026-08-06\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/expenses/{{expenseId}}?userId={{userId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "expenses",
-                "{{expenseId}}"
-              ],
-              "query": [
+            "auth": {
+              "type": "bearer",
+              "bearer": [
                 {
-                  "key": "userId",
-                  "value": "{{userId}}"
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
                 }
               ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get updated expense",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () { ",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "const response = pm.response.json();",
-                  "",
-                  "pm.test(\"Expense amount was updated\", function () { ",
-                  "    pm.expect(response.json().amount).to.eql(200.00);",
-                  "});",
-                  "",
-                  "pm.test(\"Expense name was updated\", function() {",
-                  "    pm.expect(response.json().name).to.eql(\"Updated expense\");",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
+            },
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/expenses/{{expenseId}}?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/expenses",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
-                "expenses",
-                "{{expenseId}}"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Delete expense",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 204\", function() {",
-                  "    pm.response.to.have.status(204);",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/expenses/{{expenseId}}?userId={{userId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "expenses",
-                "{{expenseId}}"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
+                "expenses"
               ]
             }
           },
@@ -791,6 +406,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [
               {
@@ -807,6 +432,785 @@
               "path": [
                 "api",
                 "categories"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Expenses",
+      "item": [
+        {
+          "name": "Create Expense",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.environment.set(\"expenseId\", response.id);",
+                  "",
+                  "pm.test(\"Expense has an ID\", function(){",
+                  "    pm.expect(response.id).to.exist;",
+                  "});",
+                  "",
+                  "pm.test(\"Expense title is correct\", function () {",
+                  "    pm.expect(response.title).to.eql(\"Groceries\");",
+                  "});",
+                  "",
+                  "pm.test(\"Expense amount is correct\", function () {",
+                  "    pm.expect(response.amount).to.eql(125.50);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Groceries\",\n    \"description\": \"Weekly groceries\",\n    \"amount\": 125.50,\n    \"categoryId\": 1,\n    \"expenseDate\": \"2026-08-07\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Missing title",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 500\", function () {",
+                  "    pm.response.to.have.status(500);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"description\": \"Weekly groceries\",\n    \"amount\": 125.50,\n    \"categoryId\": 1,\n    \"expenseDate\": \"2026-08-07\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid amount",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 500\", function () {",
+                  "    pm.response.to.have.status(500);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Groceries\",\n    \"description\": \"Weekly groceries\",\n    \"amount\": -1,\n    \"categoryId\": 1,\n    \"expenseDate\": \"2026-08-07\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Missing category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 500\", function () {",
+                  "    pm.response.to.have.status(500);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Groceries\",\n    \"description\": \"Weekly groceries\",\n    \"amount\": 125.50,\n    \"expenseDate\": \"2026-08-07\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Missing date",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 500\", function () {",
+                  "    pm.response.to.have.status(500);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Groceries\",\n    \"description\": \"Weekly groceries\",\n    \"amount\": 125.50,\n    \"categoryId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Expense by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"ID is correct\", function () {",
+                  "    pm.expect(response.id).to.eql(pm.environment.get(\"expenseId\"));",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/{{expenseId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses",
+                "{{expenseId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search expense",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { ",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Expense title is correct\", function () {",
+                  "    pm.expect(response[0].title).to.eql(\"Groceries\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/search?title=Groceries",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "title",
+                  "value": "Groceries"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filter expenses",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { ",
+                  "        pm.response.to.have.status(200); ",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses?categoryId=1&minAmount=100&maxAmount=150&start=2026-08-03&end=2026-08-07",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses"
+              ],
+              "query": [
+                {
+                  "key": "categoryId",
+                  "value": "1"
+                },
+                {
+                  "key": "minAmount",
+                  "value": "100"
+                },
+                {
+                  "key": "maxAmount",
+                  "value": "150"
+                },
+                {
+                  "key": "start",
+                  "value": "2026-08-03"
+                },
+                {
+                  "key": "end",
+                  "value": "2026-08-07"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid filter amount",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Error message is correct\", function () {",
+                  "    pm.expect(pm.response.json().error).to.eql(\"Bad Request\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses?categoryId=1&minAmount=100&maxAmount=15&start=2026-08-03&end=2026-08-07",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses"
+              ],
+              "query": [
+                {
+                  "key": "categoryId",
+                  "value": "1"
+                },
+                {
+                  "key": "minAmount",
+                  "value": "100"
+                },
+                {
+                  "key": "maxAmount",
+                  "value": "15"
+                },
+                {
+                  "key": "start",
+                  "value": "2026-08-03"
+                },
+                {
+                  "key": "end",
+                  "value": "2026-08-07"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid filter date",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Error message is correct\", function () {",
+                  "    pm.expect(pm.response.json().error).to.eql(\"Bad Request\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses?categoryId=1&minAmount=100&maxAmount=15&start=2026-08-03&end=2026-08-01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses"
+              ],
+              "query": [
+                {
+                  "key": "categoryId",
+                  "value": "1"
+                },
+                {
+                  "key": "minAmount",
+                  "value": "100"
+                },
+                {
+                  "key": "maxAmount",
+                  "value": "15"
+                },
+                {
+                  "key": "start",
+                  "value": "2026-08-03"
+                },
+                {
+                  "key": "end",
+                  "value": "2026-08-01"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update expense",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Updated expense\",\n    \"description\": \"Weekly groceries\",\n    \"amount\": 200.00,\n    \"categoryId\": 1,\n    \"expenseDate\": \"2026-08-06\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/{{expenseId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses",
+                "{{expenseId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get updated expense",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { ",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Expense amount was updated\", function () { ",
+                  "    pm.expect(response.amount).to.eql(200.00);",
+                  "});",
+                  "",
+                  "pm.test(\"Expense name was updated\", function() {",
+                  "    pm.expect(response.title).to.eql(\"Updated expense\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/{{expenseId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses",
+                "{{expenseId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete expense",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function() {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/{{expenseId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses",
+                "{{expenseId}}"
               ]
             }
           },
@@ -851,6 +1255,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [
               {
@@ -869,19 +1283,13 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/recurringexpenses?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/recurringexpenses",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "recurringexpenses"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
               ]
             }
           },
@@ -909,6 +1317,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "body": {
@@ -921,19 +1339,13 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/recurringexpenses?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/recurringexpenses",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "recurringexpenses"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
               ]
             }
           },
@@ -957,6 +1369,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "body": {
@@ -969,19 +1391,13 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/recurringexpenses?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/recurringexpenses",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "recurringexpenses"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
               ]
             }
           },
@@ -1011,6 +1427,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [
               {
@@ -1020,7 +1446,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/recurringexpenses/{{recurringExpenseId}}?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/recurringexpenses/{{recurringExpenseId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1028,12 +1454,6 @@
                 "api",
                 "recurringexpenses",
                 "{{recurringExpenseId}}"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
               ]
             }
           },
@@ -1057,6 +1477,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [
               {
@@ -1066,19 +1496,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/recurringexpenses?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/recurringexpenses",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "recurringexpenses"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
               ]
             }
           },
@@ -1102,6 +1526,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [
               {
@@ -1111,7 +1545,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/recurringexpenses/search?userId={{userId}}&title=Netflix subscription",
+              "raw": "{{baseUrl}}/api/recurringexpenses/search?title=Netflix subscription",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1121,10 +1555,6 @@
                 "search"
               ],
               "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                },
                 {
                   "key": "title",
                   "value": "Netflix subscription"
@@ -1152,6 +1582,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [
               {
@@ -1161,7 +1601,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/recurringexpenses/filter?userId={{userId}}&minAmount=2&maxAmount=10",
+              "raw": "{{baseUrl}}/api/recurringexpenses/filter?minAmount=2&maxAmount=10",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1171,10 +1611,6 @@
                 "filter"
               ],
               "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                },
                 {
                   "key": "minAmount",
                   "value": "2"
@@ -1210,10 +1646,20 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/recurringexpenses/filter?userId={{userId}}&minAmount=10&maxAmount=2",
+              "raw": "{{baseUrl}}/api/recurringexpenses/filter?minAmount=10&maxAmount=2",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1223,10 +1669,6 @@
                 "filter"
               ],
               "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                },
                 {
                   "key": "minAmount",
                   "value": "10"
@@ -1258,6 +1700,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PUT",
             "header": [
               {
@@ -1276,7 +1728,7 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/recurringexpenses/{{recurringExpenseId}}?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/recurringexpenses/{{recurringExpenseId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1284,12 +1736,6 @@
                 "api",
                 "recurringexpenses",
                 "{{recurringExpenseId}}"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
               ]
             }
           },
@@ -1325,6 +1771,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [
               {
@@ -1334,7 +1790,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/recurringexpenses/{{recurringExpenseId}}?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/recurringexpenses/{{recurringExpenseId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1342,12 +1798,6 @@
                 "api",
                 "recurringexpenses",
                 "{{recurringExpenseId}}"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
               ]
             }
           },
@@ -1371,6 +1821,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "DELETE",
             "header": [
               {
@@ -1380,7 +1840,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/recurringexpenses/{{recurringExpenseId}}?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/recurringexpenses/{{recurringExpenseId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1388,12 +1848,6 @@
                 "api",
                 "recurringexpenses",
                 "{{recurringExpenseId}}"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
               ]
             }
           },
@@ -1433,6 +1887,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [
               {
@@ -1451,19 +1915,13 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/budgets?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/budgets",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "budgets"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
               ]
             }
           },
@@ -1487,6 +1945,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [
               {
@@ -1505,19 +1973,13 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/budgets?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/budgets",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "budgets"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
               ]
             }
           },
@@ -1541,6 +2003,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "body": {
@@ -1553,19 +2025,13 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/budgets?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/budgets",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "budgets"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
               ]
             }
           },
@@ -1589,6 +2055,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "body": {
@@ -1601,19 +2077,13 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/budgets?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/budgets",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "budgets"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
               ]
             }
           },
@@ -1641,6 +2111,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [
               {
@@ -1650,7 +2130,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/budgets/{{budgetId}}?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/budgets/{{budgetId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1658,12 +2138,6 @@
                 "api",
                 "budgets",
                 "{{budgetId}}"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
               ]
             }
           },
@@ -1687,6 +2161,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [
               {
@@ -1696,7 +2180,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/budgets?userId={{userId}}&period=2026-08-01",
+              "raw": "{{baseUrl}}/api/budgets?period=2026-08-01",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1705,10 +2189,6 @@
                 "budgets"
               ],
               "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                },
                 {
                   "key": "period",
                   "value": "2026-08-01"
@@ -1736,6 +2216,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [
               {
@@ -1745,7 +2235,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/budgets/summary?userId={{userId}}&period=2026-08-01",
+              "raw": "{{baseUrl}}/api/budgets/summary?period=2026-08-01",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1755,10 +2245,6 @@
                 "summary"
               ],
               "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                },
                 {
                   "key": "period",
                   "value": "2026-08-01"
@@ -1786,6 +2272,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PUT",
             "header": [],
             "body": {
@@ -1798,7 +2294,7 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/budgets/{{budgetId}}?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/budgets/{{budgetId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1806,12 +2302,6 @@
                 "api",
                 "budgets",
                 "{{budgetId}}"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
               ]
             }
           },
@@ -1835,6 +2325,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [
               {
@@ -1844,7 +2344,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/budgets/{{budgetId}}?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/budgets/{{budgetId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1852,12 +2352,6 @@
                 "api",
                 "budgets",
                 "{{budgetId}}"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
               ]
             }
           },
@@ -1881,6 +2375,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "DELETE",
             "header": [
               {
@@ -1890,7 +2394,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/budgets/{{budgetId}}?userId={{userId}}",
+              "raw": "{{baseUrl}}/api/budgets/{{budgetId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1898,64 +2402,6 @@
                 "api",
                 "budgets",
                 "{{budgetId}}"
-              ],
-              "query": [
-                {
-                  "key": "userId",
-                  "value": "{{userId}}"
-                }
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Authentication",
-      "item": [
-        {
-          "name": "Register user",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 201\", function () {",
-                  "    pm.response.to.have.status(201);",
-                  "});",
-                  "",
-                  "const response = pm.response.json();",
-                  "",
-                  "pm.environment.set(\"userId\", response.id);"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"username\": \"test_user\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Smith\",\n    \"password\": \"user123\",\n    \"email\": \"johnsmith@gmail.com\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/auth/register",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "register"
               ]
             }
           },
