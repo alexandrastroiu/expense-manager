@@ -12,6 +12,12 @@ services:
       - "5432:5432"
     volumes:
       - database_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
 
   backend:
     build: ./backend
@@ -22,7 +28,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - database
+      database:
+        condition: service_healthy
 
 volumes:
   database_data:
