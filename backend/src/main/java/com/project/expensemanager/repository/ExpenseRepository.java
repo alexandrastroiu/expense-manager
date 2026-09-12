@@ -8,11 +8,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface ExpenseRepository extends JpaRepository<Expense, Integer> {
 
     // Query methods
     List<Expense> findByUser(User user);
+
+    Optional<Expense> findByUserAndId(User user, Integer id);
 
     List<Expense> findByUserAndExpenseDate(User user, LocalDate expenseDate);
 

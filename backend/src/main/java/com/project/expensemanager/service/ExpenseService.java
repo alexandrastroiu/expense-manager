@@ -1,13 +1,10 @@
 package com.project.expensemanager.service;
 
-import com.project.expensemanager.dto.expense.ExpenseRequest;
-import com.project.expensemanager.dto.expense.ExpenseResponse;
 import com.project.expensemanager.entity.Category;
 import com.project.expensemanager.entity.Expense;
 import com.project.expensemanager.entity.User;
 import com.project.expensemanager.exception.InvalidRequestException;
 import com.project.expensemanager.exception.ResourceNotFoundException;
-import com.project.expensemanager.exception.UnauthorizedAccessException;
 import com.project.expensemanager.repository.CategoryRepository;
 import com.project.expensemanager.repository.ExpenseRepository;
 import org.springframework.stereotype.Service;
@@ -31,6 +28,8 @@ public class ExpenseService {
     // Business logic
     // Create
     public Expense createExpense(Expense expense) {
+        Category category = categoryRepository.findById(expense.getCategory().getId()).orElseThrow( () -> new ResourceNotFoundException("Category not found"));
+
         return expenseRepository.save(expense);
     }
 
@@ -40,12 +39,7 @@ public class ExpenseService {
     }
 
     public Expense getUserExpenseById(User user, Integer expenseId) {
-        Expense expense = expenseRepository.findById(expenseId).orElseThrow(() -> new ResourceNotFoundException("Expense not found."));
-
-        if (expense.getUser().getId().equals(user.getId())) {
-            return expense;
-        }
-        throw new RuntimeException("Cannot access this expense.");
+        return expenseRepository.findByUserAndId(user, expenseId).orElseThrow(() -> new ResourceNotFoundException("Expense not found."));
     }
 
     public List<Expense> getUserExpensesByDate(User user, LocalDate expenseDate) {
@@ -74,29 +68,27 @@ public class ExpenseService {
             Integer categoryId,
             BigDecimal amount
     ) {
-        List<Expense> userExpenses;
-
-        if (title != null) {
-            userExpenses = getUserExpensesByTitle(user, title);
-        }
-        else if (expenseDate != null) {
-            userExpenses = getUserExpensesByDate(user, expenseDate);
-        }
-        else if (amount != null) {
-            userExpenses = getUserExpensesByAmount(user, amount);
-        }
-        else if (categoryId != null) {
-            userExpenses = getUserExpensesByCategory(user, categoryId);
-        }
-        else {
-            userExpenses = getExpensesForUser(user);
-        }
-
-        return userExpenses;
+        return getExpensesForUser(user).stream()
+                .filter(expense -> expenseDate == null || expense.getExpenseDate().equals(expenseDate))
+                .filter(expense -> title == null || expense.getTitle().toLowerCase().trim().equals(title.toLowerCase().trim()))
+                .filter(expense -> categoryId == null || expense.getCategory().getId().equals(categoryId))
+                .filter(expense -> amount == null || expense.getAmount().compareTo(amount) == 0)
+                .toList();
     }
 
     // Filter user expenses
    public List<Expense> filterExpenses(User user, Integer categoryId, BigDecimal minAmount, BigDecimal maxAmount, LocalDate start, LocalDate end) {
+        boolean hasAmountRange = minAmount != null && maxAmount != null;
+        boolean hasPartialAmountRange = minAmount != null ^ maxAmount != null;
+        boolean hasSingleDate = start != null ^ end != null;
+
+        if (hasPartialAmountRange) {
+            throw new InvalidRequestException("Both minimum amount and maximum amount must be provided.");
+        }
+
+        if (hasAmountRange && hasSingleDate) {
+            throw new InvalidRequestException("An amount range can only be combined with a complete date range.");
+        }
 
         if (categoryId != null) {
             Category selectedCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category not found."));
@@ -109,7 +101,6 @@ public class ExpenseService {
 
             if (start != null && end != null) {
                 validateDate(end, start);
-                validateAmount(minAmount, maxAmount);
                 return expenseRepository.findByUserAndCategoryAndExpenseDateBetween(user, selectedCategory, start, end);
             }
 
@@ -162,7 +153,7 @@ public class ExpenseService {
     public Expense updateExpense(User user, Integer expenseId, Expense updatedExpense) {
         Expense expense = getUserExpenseById(user, expenseId);
 
-        Category category = categoryRepository.findById(expense.getCategory().getId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+        Category category = categoryRepository.findById(updatedExpense.getCategory().getId()).orElseThrow(() -> new ResourceNotFoundException("Category not found."));
 
         expense.setTitle(updatedExpense.getTitle());
         expense.setDescription(updatedExpense.getDescription());

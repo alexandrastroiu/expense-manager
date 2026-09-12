@@ -9,13 +9,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.math.BigDecimal;
 import java.util.BitSet;
 import java.util.List;
+import java.util.Optional;
 
 public interface RecurringExpenseRepository extends JpaRepository<RecurringExpense, Integer> {
 
     // Query methods
     List<RecurringExpense> findByUser(User user);
 
-    RecurringExpense findByUserAndId(User user, Integer id);
+    Optional<RecurringExpense> findByUserAndId(User user, Integer id);
 
     List<RecurringExpense> findByUserAndTitle(User user, String title);
 

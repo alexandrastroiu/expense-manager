@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 public record BudgetRequest(
         @NotNull(message = "Amount is required")
-        @Positive
+        @Positive(message = "Amount must be greater than zero.")
         BigDecimal amount,
 
         @NotNull(message = "Budget period is required")

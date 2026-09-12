@@ -43,6 +43,10 @@ public class User {
         this.email = email;
     }
 
+    public User(String username) {
+        this.username = username;
+    }
+
     // Getters and Setters
     public String getUsername() {
         return username;

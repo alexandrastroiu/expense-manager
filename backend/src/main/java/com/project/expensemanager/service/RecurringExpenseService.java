@@ -1,7 +1,5 @@
 package com.project.expensemanager.service;
 
-import com.project.expensemanager.dto.recurringexpense.RecurringExpenseRequest;
-import com.project.expensemanager.dto.recurringexpense.RecurringExpenseResponse;
 import com.project.expensemanager.entity.Category;
 import com.project.expensemanager.entity.Frequency;
 import com.project.expensemanager.entity.RecurringExpense;
@@ -42,7 +40,7 @@ public class RecurringExpenseService {
     public RecurringExpense updateRecurringExpense(Integer recurringExpenseId,User user, RecurringExpense updatedRecurringExpense) {
         RecurringExpense recurringExpense = getUserRecurringExpenseById(user, recurringExpenseId);
 
-        Category category = categoryRepository.findById(recurringExpense.getCategory().getId()).orElseThrow( () -> new ResourceNotFoundException("Category not found"));
+        Category category = categoryRepository.findById(updatedRecurringExpense.getCategory().getId()).orElseThrow( () -> new ResourceNotFoundException("Category not found."));
 
         validateDate(updatedRecurringExpense.getEndDate(), updatedRecurringExpense.getStartDate());
 
@@ -59,7 +57,7 @@ public class RecurringExpenseService {
 
     // Read
     public RecurringExpense getUserRecurringExpenseById(User user, Integer recurringExpenseId) {
-        return recurringExpenseRepository.findByUserAndId(user, recurringExpenseId);
+        return recurringExpenseRepository.findByUserAndId(user, recurringExpenseId).orElseThrow(() -> new ResourceNotFoundException("Recurring Expense not found."));
     }
 
     public List<RecurringExpense> getUserRecurringExpenseByTitle(User user, String title) {
@@ -86,22 +84,11 @@ public class RecurringExpenseService {
             Integer categoryId,
             Frequency frequency
     ) {
-        List<RecurringExpense> userRecurringExpenses;
-
-        if (title != null) {
-            userRecurringExpenses = getUserRecurringExpenseByTitle(user, title);
-        }
-        else if (categoryId != null) {
-            userRecurringExpenses = getUserRecurringExpenseByCategory(user, categoryId);
-        }
-        else if (frequency != null) {
-            userRecurringExpenses = getUserRecurringExpenseByFrequency(user, frequency);
-        }
-        else {
-            userRecurringExpenses = getAllUserRecurringExpenses(user);
-        }
-
-        return userRecurringExpenses;
+        return getAllUserRecurringExpenses(user).stream()
+                .filter(recurringExpense -> title == null || recurringExpense.getTitle().toLowerCase().trim().equals(title.toLowerCase().trim()))
+                .filter(recurringExpense -> categoryId == null || recurringExpense.getCategory().getId().equals(categoryId))
+                .filter(recurringExpense -> frequency == null || recurringExpense.getFrequency().equals(frequency))
+                .toList();
     }
 
     // Filter
@@ -121,7 +108,7 @@ public class RecurringExpenseService {
     // Helper method
     private void validateDate(LocalDate endDate, LocalDate startDate) {
         if (endDate != null && endDate.isBefore(startDate)) {
-            throw new InvalidRequestException("End date cannot be before start date");
+            throw new InvalidRequestException("End date cannot be before start date.");
         }
     }
 }

@@ -170,10 +170,6 @@ public class BudgetService {
         BigDecimal budget = getUserBudgetByPeriod(user, period).getAmount();
         BigDecimal expenses = getTotalMonthlyExpenses(user, period);
 
-        if (budget.compareTo(BigDecimal.ZERO) == 0) {   // Handle edge case
-            return BigDecimal.ZERO;
-        }
-
         return expenses.multiply(BigDecimal.valueOf(100)).divide(budget, RoundingMode.HALF_UP);
     }
 
