@@ -84,7 +84,7 @@ public class RecurringExpenseServiceTest {
         Exception exception = assertThrows(InvalidRequestException.class,
                 () -> recurringExpenseService.createRecurringExpense(recurringExpense)
         );
-        assertEquals("End date cannot be before start date", exception.getMessage());
+        assertEquals("End date cannot be before start date.", exception.getMessage());
         verify(recurringExpenseRepository, never()).delete(any(RecurringExpense.class));
     }
 
