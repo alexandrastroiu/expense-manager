@@ -49,7 +49,9 @@ jobs:
         run: npm install -g newman
 
       - name: Run Postman collection
-        run: newman run postman/"Expense Manager API.postman_collection.json"   # Run Postman API tests
+        env:
+          BASE_URL: http://localhost:8080
+        run: newman run postman/"Expense Manager API.postman_collection.json" --env-var "baseUrl=$BASE_URL"   # Run Postman API tests
 
       - name: Stop containers
         if: ${{ always() }}   # Always run this step
