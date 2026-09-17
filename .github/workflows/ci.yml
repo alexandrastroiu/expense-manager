@@ -49,8 +49,8 @@ jobs:
         run: npm install -g newman
 
       - name: Run Postman collection
-        run: newman run "Expense Manager API.postman_collection.json"   # Run Postman API tests
+        run: newman run postman/"Expense Manager API.postman_collection.json"   # Run Postman API tests
 
       - name: Stop containers
         if: ${{ always() }}   # Always run this step
-        run: docker compose down -v   # Stop and removes the containers, networks, volumes, images created
+        run: docker compose down -v   # Stops and removes the containers, networks, volumes, images created
