@@ -32,6 +32,12 @@ jobs:
         run: cd backend && ./mvnw clean test -Dtest="!ExpenseManagerApplicationTests"   # Run only unit tests
 
       - name: Start the application
+        env:
+          POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+          POSTGRES_USER: ${{ vars.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.CI_POSTGRES_PASSWORD }}
+          JWT_SECRET: ${{ secrets.CI_JWT_SECRET }}
+
         run: docker compose up --build -d    # Build before starting containers
 
       - name: Set up node.js
